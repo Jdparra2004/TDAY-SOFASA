@@ -1,0 +1,9 @@
+simpy
+ortools
+pandas
+numpy
+matplotlib
+streamlit
+openpyxl
+plotly
+kaleido

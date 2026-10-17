@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+.agents/
+.claude/
+.DS_Store
+graphify-out/
+.gemini/
+GEMINI.mdbaseline_original/
+.zip
+.streamlit/secrets.toml

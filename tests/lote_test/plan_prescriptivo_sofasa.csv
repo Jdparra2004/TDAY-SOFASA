@@ -1,0 +1,716 @@
+ID Contenedor,Buque,ETA Puerto,Fecha Ruptura (Need By),Ruta Óptima,Recepción Suppla,Entrada a Planta (EM),Estado de Riesgo
+SUDU6971194,MAERSK YAMUNA,50,60,Directo a Fábrica,N/A,Día 60,A Tiempo (Objetivo)
+MRSU9041080,MAERSK RUBICON,52,59,Directo a Fábrica,N/A,Día 59,A Tiempo (Objetivo)
+TCNU3886074,NORDCHEETAH,73,83,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU7379756,MSC MAGNUM VII,35,45,Directo a Fábrica,N/A,Día 43,A Tiempo (Objetivo)
+TCNU1169515,CARDIFF,35,63,Directo a Fábrica,N/A,Día 44,A Tiempo (Objetivo)
+TRHU8889399,CARDIFF,35,60,Directo a Fábrica,N/A,Día 42,A Tiempo (Objetivo)
+TLLU7765359,CARDIFF,35,64,Directo a Fábrica,N/A,Día 42,A Tiempo (Objetivo)
+TCNU6521892,CARDIFF,35,45,Directo a Fábrica,N/A,Día 45,A Tiempo (Objetivo)
+TGCU5505458,CARDIFF,35,45,Directo a Fábrica,N/A,Día 43,A Tiempo (Objetivo)
+TRHU7083304,CARDIFF,35,45,Directo a Fábrica,N/A,Día 45,A Tiempo (Objetivo)
+TCKU6305625,CARDIFF,35,67,Directo a Fábrica,N/A,Día 45,A Tiempo (Objetivo)
+CAAU7097150,CARDIFF,35,67,Directo a Fábrica,N/A,Día 42,A Tiempo (Objetivo)
+FFAU4776891,CARDIFF,35,45,Directo a Fábrica,N/A,Día 44,A Tiempo (Objetivo)
+FSCU8647332,CARDIFF,35,45,Directo a Fábrica,N/A,Día 43,A Tiempo (Objetivo)
+TIIU8106164,CARDIFF,35,45,Directo a Fábrica,N/A,Día 45,A Tiempo (Objetivo)
+CMAU4417342,CARDIFF,35,45,Directo a Fábrica,N/A,Día 45,A Tiempo (Objetivo)
+MRKU4848328,MSC MAGNUM VII,35,45,Directo a Fábrica,N/A,Día 45,A Tiempo (Objetivo)
+TIIU5872232,MSC MAGNUM VII,35,45,Directo a Fábrica,N/A,Día 44,A Tiempo (Objetivo)
+TCNU8644577,MSC MAGNUM VII,35,45,Directo a Fábrica,N/A,Día 44,A Tiempo (Objetivo)
+MSKU9745788,MSC MAGNUM VII,35,53,Suppla Rionegro,Día 45,Día 45,A Tiempo (Objetivo)
+TRHU4860355,MSC MAGNUM VII,35,54,Directo a Fábrica,N/A,Día 45,A Tiempo (Objetivo)
+TLLU5866777,MSC MAGNUM VII,35,45,Directo a Fábrica,N/A,Día 44,A Tiempo (Objetivo)
+MSKU1865447,MSC MAGNUM VII,35,45,Directo a Fábrica,N/A,Día 42,A Tiempo (Objetivo)
+UETU6941295,MSC MAGNUM VII,35,54,Directo a Fábrica,N/A,Día 44,A Tiempo (Objetivo)
+MRKU6299778,MSC MAGNUM VII,35,53,Directo a Fábrica,N/A,Día 44,A Tiempo (Objetivo)
+MSKU1958909,MSC MAGNUM VII,35,45,Directo a Fábrica,N/A,Día 45,A Tiempo (Objetivo)
+TGBU6013799,MSC MAGNUM VII,35,53,Directo a Fábrica,N/A,Día 42,A Tiempo (Objetivo)
+TCKU6870400,MSC MAGNUM VII,35,55,Directo a Fábrica,N/A,Día 43,A Tiempo (Objetivo)
+SUDU6966325,MAERSK PANGANI,43,53,Directo a Fábrica,N/A,Día 52,A Tiempo (Objetivo)
+TGBU9253216,MAERSK PANGANI,43,61,Directo a Fábrica,N/A,Día 53,A Tiempo (Objetivo)
+TIIU5280927,MAERSK PANGANI,43,55,Suppla Rionegro,Día 50,Día 50,A Tiempo (Objetivo)
+MRSU9198697,MAERSK PANGANI,43,53,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+MRSU9185935,MAERSK PANGANI,43,59,Directo a Fábrica,N/A,Día 53,A Tiempo (Objetivo)
+MRKU6195979,MAERSK PANGANI,43,53,Directo a Fábrica,N/A,Día 53,A Tiempo (Objetivo)
+MRSU8515755,MAERSK PANGANI,43,56,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+CAAU6741870,MAERSK PANGANI,43,54,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+MRKU2950599,MAERSK PANGANI,43,56,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+TCNU1207111,MAERSK PANGANI,43,55,Directo a Fábrica,N/A,Día 52,A Tiempo (Objetivo)
+MRSU7736263,MAERSK PANGANI,43,56,Directo a Fábrica,N/A,Día 51,A Tiempo (Objetivo)
+GCXU5568228,MAERSK PANGANI,43,55,Directo a Fábrica,N/A,Día 53,A Tiempo (Objetivo)
+CAJU5038848,MAERSK PANGANI,43,56,Directo a Fábrica,N/A,Día 52,A Tiempo (Objetivo)
+TIIU5903708,MAERSK PANGANI,43,56,Directo a Fábrica,N/A,Día 53,A Tiempo (Objetivo)
+TIIU5582906,MAERSK PANGANI,43,53,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+TRHU7301387,MAERSK PANGANI,43,53,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+CAAU8387596,MAERSK PANGANI,43,55,Directo a Fábrica,N/A,Día 53,A Tiempo (Objetivo)
+SEKU6714441,MAERSK PANGANI,43,60,Directo a Fábrica,N/A,Día 52,A Tiempo (Objetivo)
+TCNU4731776,MAERSK PANGANI,43,60,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+MRSU4603230,MAERSK PANGANI,43,61,Directo a Fábrica,N/A,Día 52,A Tiempo (Objetivo)
+MRSU7036188,MAERSK PANGANI,43,59,Directo a Fábrica,N/A,Día 52,A Tiempo (Objetivo)
+GCXU6370704,MAERSK PANGANI,43,55,Suppla Rionegro,Día 50,Día 50,A Tiempo (Objetivo)
+BEAU5017554,MAERSK PANGANI,43,54,Directo a Fábrica,N/A,Día 53,A Tiempo (Objetivo)
+MRKU5044221,MAERSK PANGANI,43,59,Directo a Fábrica,N/A,Día 51,A Tiempo (Objetivo)
+MRSU7227688,MAERSK PANGANI,43,55,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+MRSU8469710,MAERSK PANGANI,43,53,Directo a Fábrica,N/A,Día 52,A Tiempo (Objetivo)
+TCNU4190347,MAERSK PANGANI,43,59,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+TEMU8886122,MAERSK PANGANI,43,60,Directo a Fábrica,N/A,Día 52,A Tiempo (Objetivo)
+SUDU6917948,MAERSK PANGANI,43,59,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+CIPU5153400,MAERSK PANGANI,43,53,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+MRKU5034943,MAERSK PANGANI,43,69,Suppla Rionegro,Día 52,Día 52,A Tiempo (Objetivo)
+ECMU5317700,SWANSEA,44,59,Directo a Fábrica,N/A,Día 53,A Tiempo (Objetivo)
+SELU4260408,SWANSEA,44,56,Directo a Fábrica,N/A,Día 54,A Tiempo (Objetivo)
+TCNU7276001,SWANSEA,44,56,Directo a Fábrica,N/A,Día 54,A Tiempo (Objetivo)
+CMAU8802671,SWANSEA,44,61,Directo a Fábrica,N/A,Día 54,A Tiempo (Objetivo)
+ECMU5108320,SWANSEA,44,61,Directo a Fábrica,N/A,Día 54,A Tiempo (Objetivo)
+TCNU7565560,SWANSEA,44,61,Suppla Rionegro,Día 52,Día 52,A Tiempo (Objetivo)
+TCNU4147150,SWANSEA,44,63,Directo a Fábrica,N/A,Día 52,A Tiempo (Objetivo)
+CAIU8960592,SWANSEA,44,54,Directo a Fábrica,N/A,Día 53,A Tiempo (Objetivo)
+TCKU6266684,SWANSEA,44,64,Directo a Fábrica,N/A,Día 54,A Tiempo (Objetivo)
+BSIU9740670,SWANSEA,44,62,Directo a Fábrica,N/A,Día 54,A Tiempo (Objetivo)
+TCNU5158988,SWANSEA,44,55,Directo a Fábrica,N/A,Día 52,A Tiempo (Objetivo)
+CMAU3868300,SWANSEA,44,56,Directo a Fábrica,N/A,Día 53,A Tiempo (Objetivo)
+GAOU6973727,SWANSEA,44,54,Directo a Fábrica,N/A,Día 53,A Tiempo (Objetivo)
+ECMU7669459,SWANSEA,44,61,Directo a Fábrica,N/A,Día 54,A Tiempo (Objetivo)
+CAAU5473664,SWANSEA,44,73,Directo a Fábrica,N/A,Día 54,A Tiempo (Objetivo)
+CMAU6622840,SWANSEA,44,55,Directo a Fábrica,N/A,Día 53,A Tiempo (Objetivo)
+GAOU7612009,SWANSEA,44,60,Directo a Fábrica,N/A,Día 52,A Tiempo (Objetivo)
+SEGU4149692,SWANSEA,44,56,Directo a Fábrica,N/A,Día 54,A Tiempo (Objetivo)
+CAIU9362506,SWANSEA,44,54,Directo a Fábrica,N/A,Día 54,A Tiempo (Objetivo)
+CMAU6475287,SWANSEA,44,63,Directo a Fábrica,N/A,Día 54,A Tiempo (Objetivo)
+CMAU6783361,SWANSEA,44,59,Directo a Fábrica,N/A,Día 54,A Tiempo (Objetivo)
+ECMU7643433,SWANSEA,44,62,Directo a Fábrica,N/A,Día 53,A Tiempo (Objetivo)
+TCKU7903684,SWANSEA,44,54,Directo a Fábrica,N/A,Día 52,A Tiempo (Objetivo)
+TIIU7093062,SWANSEA,44,61,Directo a Fábrica,N/A,Día 51,A Tiempo (Objetivo)
+TCNU6635998,SWANSEA,44,62,Directo a Fábrica,N/A,Día 53,A Tiempo (Objetivo)
+TXGU8659100,SWANSEA,44,64,Directo a Fábrica,N/A,Día 52,A Tiempo (Objetivo)
+TCKU6303129,SWANSEA,44,56,Directo a Fábrica,N/A,Día 51,A Tiempo (Objetivo)
+TXGU8656375,SWANSEA,44,62,Directo a Fábrica,N/A,Día 53,A Tiempo (Objetivo)
+TXGU8659142,SWANSEA,44,64,Directo a Fábrica,N/A,Día 54,A Tiempo (Objetivo)
+ECMU4982053,CMA CGM XIAMEN,49,60,Directo a Fábrica,N/A,Día 57,A Tiempo (Objetivo)
+CMAU6846536,CMA CGM XIAMEN,49,69,Directo a Fábrica,N/A,Día 56,A Tiempo (Objetivo)
+TCNU2319029,CMA CGM XIAMEN,49,59,Directo a Fábrica,N/A,Día 56,A Tiempo (Objetivo)
+TCNU6128170,CMA CGM XIAMEN,49,60,Directo a Fábrica,N/A,Día 56,A Tiempo (Objetivo)
+UETU7296010,CMA CGM XIAMEN,49,63,Directo a Fábrica,N/A,Día 56,A Tiempo (Objetivo)
+TRHU8211821,CMA CGM XIAMEN,49,62,Directo a Fábrica,N/A,Día 58,A Tiempo (Objetivo)
+CMAU7522151,CMA CGM XIAMEN,49,59,Directo a Fábrica,N/A,Día 56,A Tiempo (Objetivo)
+FFAU4330030,CMA CGM XIAMEN,49,61,Directo a Fábrica,N/A,Día 56,A Tiempo (Objetivo)
+SEGU4411478,CMA CGM XIAMEN,49,59,Directo a Fábrica,N/A,Día 56,A Tiempo (Objetivo)
+TGCU5239569,CMA CGM XIAMEN,49,61,Directo a Fábrica,N/A,Día 59,A Tiempo (Objetivo)
+TIIU7062713,CMA CGM XIAMEN,49,62,Directo a Fábrica,N/A,Día 58,A Tiempo (Objetivo)
+CMAU6536232,CMA CGM XIAMEN,49,61,Directo a Fábrica,N/A,Día 59,A Tiempo (Objetivo)
+CMAU4700141,CMA CGM XIAMEN,49,62,Directo a Fábrica,N/A,Día 56,A Tiempo (Objetivo)
+TCNU1238030,CMA CGM XIAMEN,49,59,Directo a Fábrica,N/A,Día 57,A Tiempo (Objetivo)
+APHU7240421,CMA CGM XIAMEN,49,60,Directo a Fábrica,N/A,Día 56,A Tiempo (Objetivo)
+CMAU7822478,CMA CGM XIAMEN,49,62,Directo a Fábrica,N/A,Día 59,A Tiempo (Objetivo)
+CAIU8967935,CMA CGM XIAMEN,49,56,Directo a Fábrica,N/A,Día 56,A Tiempo (Objetivo)
+SEKU5719876,CMA CGM XIAMEN,49,62,Directo a Fábrica,N/A,Día 58,A Tiempo (Objetivo)
+TRHU7688358,CMA CGM XIAMEN,49,61,Directo a Fábrica,N/A,Día 56,A Tiempo (Objetivo)
+TRHU8788650,CMA CGM XIAMEN,49,62,Directo a Fábrica,N/A,Día 56,A Tiempo (Objetivo)
+MRSU7755730,MSC YAMUNA VI,50,60,Directo a Fábrica,N/A,Día 60,A Tiempo (Objetivo)
+MRSU4166887,MSC YAMUNA VI,50,63,Directo a Fábrica,N/A,Día 58,A Tiempo (Objetivo)
+MRKU4185800,MSC YAMUNA VI,50,61,Directo a Fábrica,N/A,Día 57,A Tiempo (Objetivo)
+MRSU3531840,MSC YAMUNA VI,50,61,Directo a Fábrica,N/A,Día 58,A Tiempo (Objetivo)
+MRSU8847615,MSC YAMUNA VI,50,68,Directo a Fábrica,N/A,Día 60,A Tiempo (Objetivo)
+MRSU3228670,MSC YAMUNA VI,50,60,Directo a Fábrica,N/A,Día 57,A Tiempo (Objetivo)
+TCKU7005129,MSC YAMUNA VI,50,69,Directo a Fábrica,N/A,Día 59,A Tiempo (Objetivo)
+CIPU5112525,MSC YAMUNA VI,50,63,Directo a Fábrica,N/A,Día 57,A Tiempo (Objetivo)
+GCXU5742793,MSC YAMUNA VI,50,64,Directo a Fábrica,N/A,Día 58,A Tiempo (Objetivo)
+MRSU9010048,MSC YAMUNA VI,50,67,Directo a Fábrica,N/A,Día 58,A Tiempo (Objetivo)
+MRSU8673529,MSC YAMUNA VI,50,67,Directo a Fábrica,N/A,Día 57,A Tiempo (Objetivo)
+CAAU5403369,MSC YAMUNA VI,50,60,Directo a Fábrica,N/A,Día 57,A Tiempo (Objetivo)
+MRSU4247438,MSC YAMUNA VI,50,62,Directo a Fábrica,N/A,Día 57,A Tiempo (Objetivo)
+GCXU5555339,MSC YAMUNA VI,50,63,Directo a Fábrica,N/A,Día 58,A Tiempo (Objetivo)
+MRKU5733257,MSC YAMUNA VI,50,67,Directo a Fábrica,N/A,Día 57,A Tiempo (Objetivo)
+GAOU7065690,MSC YAMUNA VI,50,64,Directo a Fábrica,N/A,Día 58,A Tiempo (Objetivo)
+CAJU5095215,MSC YAMUNA VI,50,62,Directo a Fábrica,N/A,Día 58,A Tiempo (Objetivo)
+MRSU7467570,MSC YAMUNA VI,50,67,Directo a Fábrica,N/A,Día 57,A Tiempo (Objetivo)
+MRSU3359618,MSC YAMUNA VI,50,64,Suppla Rionegro,Día 59,Día 59,A Tiempo (Objetivo)
+MRSU7069089,MSC YAMUNA VI,50,68,Directo a Fábrica,N/A,Día 58,A Tiempo (Objetivo)
+TRHU7942903,MSC YAMUNA VI,50,74,Directo a Fábrica,N/A,Día 58,A Tiempo (Objetivo)
+TRHU8047359,MSC YAMUNA VI,50,64,Directo a Fábrica,N/A,Día 57,A Tiempo (Objetivo)
+CRSU9178807,MSC YAMUNA VI,50,62,Directo a Fábrica,N/A,Día 58,A Tiempo (Objetivo)
+TCKU7185463,MSC YAMUNA VI,50,67,Directo a Fábrica,N/A,Día 57,A Tiempo (Objetivo)
+TCKU6406976,MSC YAMUNA VI,50,64,Directo a Fábrica,N/A,Día 60,A Tiempo (Objetivo)
+MRKU3487529,MSC YAMUNA VI,50,63,Directo a Fábrica,N/A,Día 57,A Tiempo (Objetivo)
+SUDU8876004,MSC YAMUNA VI,50,64,Directo a Fábrica,N/A,Día 57,A Tiempo (Objetivo)
+TCKU7846882,MSC YAMUNA VI,50,74,Directo a Fábrica,N/A,Día 60,A Tiempo (Objetivo)
+TRHU6180402,MSC YAMUNA VI,50,60,Directo a Fábrica,N/A,Día 58,A Tiempo (Objetivo)
+MRSU5240973,MSC YAMUNA VI,50,62,Directo a Fábrica,N/A,Día 58,A Tiempo (Objetivo)
+TCLU5211637,MSC YAMUNA VI,50,67,Directo a Fábrica,N/A,Día 60,A Tiempo (Objetivo)
+HASU5080134,MSC YAMUNA VI,50,62,Directo a Fábrica,N/A,Día 60,A Tiempo (Objetivo)
+MRSU7664836,MSC YAMUNA VI,50,64,Directo a Fábrica,N/A,Día 60,A Tiempo (Objetivo)
+MRSU7386062,MSC YAMUNA VI,50,68,Directo a Fábrica,N/A,Día 60,A Tiempo (Objetivo)
+MRSU7635083,MAERSK RUBICON,52,62,Directo a Fábrica,N/A,Día 62,A Tiempo (Objetivo)
+HASU4895359,MAERSK RUBICON,52,68,Directo a Fábrica,N/A,Día 59,A Tiempo (Objetivo)
+TCNU2888935,MAERSK RUBICON,52,56,Suppla Rionegro,Día 59,Día 59,Ruptura (Tarde)
+MRKU6045048,MAERSK RUBICON,52,73,Directo a Fábrica,N/A,Día 61,A Tiempo (Objetivo)
+GCXU5575340,MAERSK RUBICON,52,67,Directo a Fábrica,N/A,Día 62,A Tiempo (Objetivo)
+MRSU8914061,MAERSK RUBICON,52,75,Directo a Fábrica,N/A,Día 62,A Tiempo (Objetivo)
+GCXU5809032,MAERSK RUBICON,52,68,Directo a Fábrica,N/A,Día 61,A Tiempo (Objetivo)
+MIEU3042955,MAERSK RUBICON,52,68,Directo a Fábrica,N/A,Día 62,A Tiempo (Objetivo)
+MRKU4812460,MAERSK RUBICON,52,62,Directo a Fábrica,N/A,Día 59,A Tiempo (Objetivo)
+MRSU5224308,MAERSK RUBICON,52,69,Suppla Rionegro,Día 59,Día 59,A Tiempo (Objetivo)
+MRSU6396512,MAERSK RUBICON,52,62,Directo a Fábrica,N/A,Día 59,A Tiempo (Objetivo)
+MRSU5971577,MAERSK RUBICON,52,74,Directo a Fábrica,N/A,Día 61,A Tiempo (Objetivo)
+MRKU2538637,MAERSK RUBICON,52,67,Directo a Fábrica,N/A,Día 60,A Tiempo (Objetivo)
+TCNU3689054,MAERSK RUBICON,52,69,Directo a Fábrica,N/A,Día 61,A Tiempo (Objetivo)
+MRKU4969145,MAERSK RUBICON,52,64,Directo a Fábrica,N/A,Día 62,A Tiempo (Objetivo)
+TCLU8279409,MAERSK RUBICON,52,69,Directo a Fábrica,N/A,Día 61,A Tiempo (Objetivo)
+TCLU8781696,MAERSK RUBICON,52,69,Directo a Fábrica,N/A,Día 60,A Tiempo (Objetivo)
+GAOU7148840,MAERSK RUBICON,52,61,Directo a Fábrica,N/A,Día 61,A Tiempo (Objetivo)
+MRSU2269994,MAERSK RUBICON,52,64,Directo a Fábrica,N/A,Día 61,A Tiempo (Objetivo)
+SEKU6993285,MAERSK RUBICON,52,62,Directo a Fábrica,N/A,Día 61,A Tiempo (Objetivo)
+MRSU5449310,MAERSK RUBICON,52,62,Directo a Fábrica,N/A,Día 59,A Tiempo (Objetivo)
+MRKU3285343,MAERSK RUBICON,52,74,Directo a Fábrica,N/A,Día 62,A Tiempo (Objetivo)
+UETU6689199,MAERSK RUBICON,52,69,Directo a Fábrica,N/A,Día 60,A Tiempo (Objetivo)
+MSKU0252100,MAERSK RUBICON,52,63,Directo a Fábrica,N/A,Día 61,A Tiempo (Objetivo)
+TRHU5229283,MAERSK RUBICON,52,63,Directo a Fábrica,N/A,Día 59,A Tiempo (Objetivo)
+MRSU2255497,MAERSK RUBICON,52,62,Directo a Fábrica,N/A,Día 59,A Tiempo (Objetivo)
+MRSU9520503,MAERSK RUBICON,52,69,Directo a Fábrica,N/A,Día 61,A Tiempo (Objetivo)
+MRSU9487940,MAERSK RUBICON,52,62,Directo a Fábrica,N/A,Día 60,A Tiempo (Objetivo)
+MRKU5320762,MAERSK RUBICON,52,67,Directo a Fábrica,N/A,Día 61,A Tiempo (Objetivo)
+TCNU2815522,MAERSK RUBICON,52,69,Directo a Fábrica,N/A,Día 59,A Tiempo (Objetivo)
+CAAU8938240,MAERSK RUBICON,52,67,Directo a Fábrica,N/A,Día 61,A Tiempo (Objetivo)
+MRSU6329026,MAERSK RUBICON,52,68,Directo a Fábrica,N/A,Día 62,A Tiempo (Objetivo)
+CIPU5002770,MAERSK RUBICON,52,62,Directo a Fábrica,N/A,Día 61,A Tiempo (Objetivo)
+ESHU7283980,CMA CGM REBELAIS,56,66,Directo a Fábrica,N/A,Día 65,A Tiempo (Objetivo)
+TCLU8961810,CMA CGM REBELAIS,56,74,Directo a Fábrica,N/A,Día 63,A Tiempo (Objetivo)
+UETU6473527,CMA CGM REBELAIS,56,66,Directo a Fábrica,N/A,Día 65,A Tiempo (Objetivo)
+BHCU4992607,CMA CGM REBELAIS,56,67,Directo a Fábrica,N/A,Día 65,A Tiempo (Objetivo)
+CMAU9683387,CMA CGM REBELAIS,56,68,Directo a Fábrica,N/A,Día 63,A Tiempo (Objetivo)
+ECMU5621081,CMA CGM REBELAIS,56,64,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+TRHU4632761,CMA CGM REBELAIS,56,73,Directo a Fábrica,N/A,Día 65,A Tiempo (Objetivo)
+CAIU7115493,CMA CGM REBELAIS,56,68,Directo a Fábrica,N/A,Día 65,A Tiempo (Objetivo)
+TCLU6595861,CMA CGM REBELAIS,56,74,Directo a Fábrica,N/A,Día 63,A Tiempo (Objetivo)
+BMOU5823111,CMA CGM REBELAIS,56,70,Suppla Rionegro,Día 64,Día 64,A Tiempo (Objetivo)
+CMAU8927534,CMA CGM REBELAIS,56,69,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+BEAU6132640,CMA CGM REBELAIS,56,70,Directo a Fábrica,N/A,Día 65,A Tiempo (Objetivo)
+CAIU7973044,CMA CGM REBELAIS,56,66,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+TGCU5072260,CMA CGM REBELAIS,56,68,Directo a Fábrica,N/A,Día 65,A Tiempo (Objetivo)
+TIIU7249392,CMA CGM REBELAIS,56,73,Directo a Fábrica,N/A,Día 63,A Tiempo (Objetivo)
+TIIU4601811,CMA CGM REBELAIS,56,69,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+CMAU3999260,CMA CGM REBELAIS,56,67,Directo a Fábrica,N/A,Día 63,A Tiempo (Objetivo)
+MAGU5474938,CMA CGM REBELAIS,56,66,Directo a Fábrica,N/A,Día 63,A Tiempo (Objetivo)
+UETU7339338,CMA CGM REBELAIS,56,74,Directo a Fábrica,N/A,Día 63,A Tiempo (Objetivo)
+DFSU7034618,CMA CGM REBELAIS,56,73,Directo a Fábrica,N/A,Día 63,A Tiempo (Objetivo)
+ECMU5623802,CMA CGM REBELAIS,56,68,Directo a Fábrica,N/A,Día 63,A Tiempo (Objetivo)
+UETU5630072,CMA CGM REBELAIS,56,66,Directo a Fábrica,N/A,Día 63,A Tiempo (Objetivo)
+CMAU7409757,CMA CGM REBELAIS,56,70,Directo a Fábrica,N/A,Día 63,A Tiempo (Objetivo)
+FSCU7146911,CMA CGM REBELAIS,56,73,Directo a Fábrica,N/A,Día 65,A Tiempo (Objetivo)
+CMAU4517423,CMA CGM REBELAIS,56,73,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+CMAU3852392,CMA CGM REBELAIS,56,67,Directo a Fábrica,N/A,Día 63,A Tiempo (Objetivo)
+TXGU8609075,CMA CGM REBELAIS,56,74,Directo a Fábrica,N/A,Día 63,A Tiempo (Objetivo)
+CMAU7281183,CMA CGM REBELAIS,56,70,Directo a Fábrica,N/A,Día 65,A Tiempo (Objetivo)
+CMAU8878276,CMA CGM REBELAIS,56,66,Directo a Fábrica,N/A,Día 63,A Tiempo (Objetivo)
+FFAU4968528,CMA CGM REBELAIS,56,74,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+MRSU7508113,MAERSK KARUN,57,67,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+CAAU6384216,MAERSK KARUN,57,74,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+TCNU6387335,MAERSK KARUN,57,74,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+MRSU5638360,MAERSK KARUN,57,74,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+TCLU9991402,MAERSK KARUN,57,69,Suppla Rionegro,Día 64,Día 64,A Tiempo (Objetivo)
+TCNU4794671,MAERSK KARUN,57,70,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+MRSU5162090,MAERSK KARUN,57,67,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+MRSU4631680,MAERSK KARUN,57,64,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+CAAU7180691,MAERSK KARUN,57,67,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+MRSU4232947,MAERSK KARUN,57,75,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+HASU4901976,MAERSK KARUN,57,67,Directo a Fábrica,N/A,Día 65,A Tiempo (Objetivo)
+MRSU7021423,MAERSK KARUN,57,67,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+MRSU8961886,MAERSK KARUN,57,68,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+TLLU5879619,MAERSK KARUN,57,67,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+MRKU5751841,MAERSK KARUN,57,69,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+TRHU4341051,MAERSK KARUN,57,70,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+MRSU4666239,MAERSK KARUN,57,67,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+TRHU4963395,MAERSK KARUN,57,74,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+SEKU6708921,MAERSK KARUN,57,67,Directo a Fábrica,N/A,Día 65,A Tiempo (Objetivo)
+MIEU3014573,MAERSK KARUN,57,68,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+HASU4620011,MAERSK KARUN,57,67,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+MRSU4747520,MAERSK KARUN,57,67,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+FFAU4787725,MAERSK KARUN,57,73,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+GCXU5681722,MAERSK KARUN,57,67,Directo a Fábrica,N/A,Día 65,A Tiempo (Objetivo)
+MRKU2090687,MAERSK KARUN,57,69,Directo a Fábrica,N/A,Día 65,A Tiempo (Objetivo)
+MRKU3738917,MAERSK KARUN,57,67,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+MRSU8111291,MAERSK KARUN,57,67,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+TRHU6210390,MAERSK KARUN,57,67,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+GCXU6260008,MAERSK KARUN,57,67,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+MRKU3716610,MAERSK KARUN,57,67,Directo a Fábrica,N/A,Día 64,A Tiempo (Objetivo)
+MRSU3798570,LE HAVRE EXPRESS,59,69,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU3512982,LE HAVRE EXPRESS,59,73,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU4988636,LE HAVRE EXPRESS,59,73,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CAAU7889603,LE HAVRE EXPRESS,59,69,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU8982678,LE HAVRE EXPRESS,59,75,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+GCXU5716686,LE HAVRE EXPRESS,59,69,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CAAU9532106,MAERSK CHAMBAL,64,75,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MIEU3026403,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU4797326,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU6135632,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+GAOU7384790,MAERSK CHAMBAL,64,77,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TEMU6165195,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+UETU5042248,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU8537245,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+GCXU5525519,MAERSK CHAMBAL,64,75,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU3854988,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU4537840,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+UETU7265580,MAERSK CHAMBAL,64,75,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+SEKU6912787,MAERSK CHAMBAL,64,75,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+GCXU5715709,MAERSK CHAMBAL,64,73,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+GCXU6316940,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCKU7306781,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU7113221,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+HASU5016644,MAERSK CHAMBAL,64,75,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCKU7792111,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+BSIU8151741,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU4652087,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MSKU9974172,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU6209397,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CAAU5641120,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU5528714,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU7671630,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TRHU5011162,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+GAOU7761609,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU2609348,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU3692932,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CAAU5167263,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+HASU4750289,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU5519986,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU5089492,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU2608681,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU4271753,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU7291394,MAERSK CHAMBAL,64,75,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU3982248,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU6064204,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU6003132,MAERSK CHAMBAL,64,75,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+GCXU5690426,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CAAU7684692,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCKU6525980,MAERSK CHAMBAL,64,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU3540013,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TGHU6333198,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU4286011,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TLLU7915952,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU5018522,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CAXU8215821,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU3388569,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU9601732,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU9818013,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+BEAU4783025,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+GCXU6092347,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+SEGU4969557,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+ECMU5415244,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+HPCU4332729,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCLU8759687,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TXGU8669984,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TXGU8656550,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU8783308,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU7421959,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+ECMU7499413,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU8463834,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TEMU7547377,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU3883500,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+FSCU8989192,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TLLU7926474,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU3500920,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU7072814,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+SEKU5924633,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TIIU8214214,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU7836759,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TIIU6167704,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU6082320,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TIIU8214338,CMA CGM PUCCINI,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CAAU6085299,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU3917023,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU5426320,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TGBU9304144,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCLU8316992,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CAAU6752621,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU7338207,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU2044980,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU5002614,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU5351489,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MSKU1395560,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU4881951,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU5561377,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU7114085,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+HASU4638366,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TRHU4397615,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU8860601,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MSKU0318471,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU6102921,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MSKU9946740,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU2327399,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU5219410,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CAAU6077272,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU7155931,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+BSIU8576807,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+FFAU5311517,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+HASU4692177,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU4432950,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU7013200,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TIIU5898113,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+UETU8203602,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU9616185,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+FFAU7569368,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU7001920,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CAAU7889922,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+FFAU7606800,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+GCXU6394856,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+SUDU8663647,MSC DAMLA,71,81,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+UETU5547158,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU9549341,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU8665619,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+ECMU5447410,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+ECMU5304750,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCKU7611548,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TIIU4595200,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU9985730,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TLLU4066553,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU6592811,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TLLU4921988,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU7005458,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU3465048,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+UETU5281134,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU9518422,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TEMU7083949,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TRHU8161103,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+ECMU5601589,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+ECMU5606560,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+SEGU6213379,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU7552602,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+BEAU4120362,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TEMU8834176,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU9596359,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+ECMU5647656,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TEMU6865558,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU1103082,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TEMU6345920,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TLLU7628654,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TXGU5277059,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+SEGU5371050,ALESSIA,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU3214648,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+GCXU5749381,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MSKU9681256,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU3538573,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU3268924,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MSKU1084017,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU4581099,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU9231368,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+FFAU7441187,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU4649592,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TEMU6581042,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+BEAU5215288,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TRHU8390898,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TLLU6913148,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU8635302,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU3727561,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU4535619,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCKU7020524,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU7665302,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MSKU1470025,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU5199360,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CAAU9243274,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CAAU9832485,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CIPU5026469,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CAAU5383391,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+HASU4180890,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU7427140,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU5100462,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+GCXU6209325,MAERSK CHACHAI,78,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCKU7824754,CMA CGM FRANCOISE SAGAN,84,94,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+HAMU2009402,JACQUES JOSEPH,41,51,Directo a Fábrica,N/A,Día 51,A Tiempo (Objetivo)
+BEAU4723469,COSCO SHIPPING SEINE,53,61,Directo a Fábrica,N/A,Día 60,A Tiempo (Objetivo)
+HAMU1590708,COSCO SHIPPING SEINE,53,63,Directo a Fábrica,N/A,Día 60,A Tiempo (Objetivo)
+TGBU9895746,COSCO SHIPPING SEINE,53,67,Directo a Fábrica,N/A,Día 61,A Tiempo (Objetivo)
+HAMU3531807,VALPARAISO EXPRESS,67,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+HLBU1554383,SALVADOR EXPRESS,74,84,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+HAMU1622430,SALVADOR EXPRESS,74,84,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+GCXU5972728,SALVADOR EXPRESS,74,84,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TIIU7534907,MSC LELLA,44,54,Directo a Fábrica,N/A,Día 54,A Tiempo (Objetivo)
+ONEU2850313,ONE SPLENDOUR,47,57,Directo a Fábrica,N/A,Día 55,A Tiempo (Objetivo)
+TGCU0012546,MSC CHIYO,62,67,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+ONEU1000700,POSORJA EXPRESS,65,75,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CAIU9161029,POSORJA EXPRESS,65,75,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+GCXU5507480,MSC JULIETTE FA635A (MJUT),74,84,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+ONEU4144851,MSC JULIETTE FA635A (MJUT),74,84,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+ONEU3507700,MSC JULIETTE FA635A (MJUT),74,84,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCLU7960378,MSC JULIETTE FA635A (MJUT),74,84,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU2401163,SEASPAN BRAVO,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+FDCU0532934,SEASPAN BRAVO,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCLU7483589,SEASPAN BRAVO 0104E,79,89,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+ONEU0910748,SEASPAN BRAVO 0104E,79,89,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+ONEU0109404,SEASPAN BRAVO 0104E,79,89,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+KKFU8100196,ONE SPARKLE,94,104,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCLU3187510,ONE SPARKLE,94,104,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+SEKU1551275,ONE SPARKLE,94,94,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU5723121,ONE SPARKLE,94,104,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+ONEU0743907,IQUIQUE EXPRESS 2636E,77,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+UETU7299662,CMA CGM MERCANTOUR,41,51,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+TIIU7654918,CMA CGM ZINGARO,47,59,Directo a Fábrica,N/A,Día 55,A Tiempo (Objetivo)
+ECMU4875203,CMA CGM BAIKAL,54,63,Directo a Fábrica,N/A,Día 61,A Tiempo (Objetivo)
+TCLU7830923,CMA CGM FIORDLAND,61,70,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TXGU8493529,CMA CGM FIORDLAND,61,73,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+SELU4137918,CMA CGM KHAO SOK,68,75,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+BMOU5255011,CMA CGM KHAO SOK,68,78,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TIIU7575444,CMA CGM KRUGER,75,85,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TLLU8778221,CMA CGM KRUGER,75,85,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CAAU8536534,CMA CGM DOLOMITES,82,92,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCKU6691940,CMA CGM DOLOMITES,82,92,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+FDCU0626118,MSC LELLA,40,60,Directo a Fábrica,N/A,Día 47,A Tiempo (Objetivo)
+ONEU0752010,MSC LELLA,40,64,Directo a Fábrica,N/A,Día 47,A Tiempo (Objetivo)
+ONEU5581922,ONE SPLENDOUR,47,57,Directo a Fábrica,N/A,Día 54,A Tiempo (Objetivo)
+ONEU5950912,MSC CHIYO,62,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU5947008,HMM EMERALD,72,82,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TRHU5773701,HMM EMERALD,72,82,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCLU1583997,HMM BLESSING,82,92,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+NYKU4937143,HMM BLESSING,82,94,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+ONEU1800895,ONE SPARKLE,94,104,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+ONEU0888135,ONE SPARKLE,94,104,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU5899281,ONE SPARKLE,94,104,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+ONEU2880175,MSC JULIETTE FA635A (MJUT),81,91,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MSKU9789596,MAERSK SAVANNAH,34,44,Directo a Fábrica,N/A,Día 44,A Tiempo (Objetivo)
+MSKU9892650,EA BAYANO  637E,37,62,Directo a Fábrica,N/A,Día 47,A Tiempo (Objetivo)
+MSKU0461435,MAERSK BULAN,41,60,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+MRKU2240067,MAERSK BULAN,41,60,Directo a Fábrica,N/A,Día 48,A Tiempo (Objetivo)
+HASU4755974,MAERSK BULAN,41,61,Directo a Fábrica,N/A,Día 51,A Tiempo (Objetivo)
+MRSU3656220,MAERSK BULAN,41,59,Directo a Fábrica,N/A,Día 49,A Tiempo (Objetivo)
+HASU4734591,MAERSK BULAN,41,56,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+TGBU9322805,MAERSK BULAN,41,64,Directo a Fábrica,N/A,Día 48,A Tiempo (Objetivo)
+MRSU6363355,MAERSK BULAN,41,62,Directo a Fábrica,N/A,Día 51,A Tiempo (Objetivo)
+MRSU3267810,MAERSK BINTAN,55,68,Directo a Fábrica,N/A,Día 62,A Tiempo (Objetivo)
+MRSU3246360,MAERSK BINTAN,55,63,Directo a Fábrica,N/A,Día 62,A Tiempo (Objetivo)
+HASU4660164,MAERSK BINTAN,55,67,Directo a Fábrica,N/A,Día 62,A Tiempo (Objetivo)
+TCNU3690271,MAERSK BINTAN,55,73,Directo a Fábrica,N/A,Día 62,A Tiempo (Objetivo)
+MRSU5748901,MAERSK BINTAN,55,65,Directo a Fábrica,N/A,Día 62,A Tiempo (Objetivo)
+TIIU5560790,MAERSK BINTAN,55,73,Directo a Fábrica,N/A,Día 62,A Tiempo (Objetivo)
+MRSU5153077,MAERSK BINTAN,55,74,Directo a Fábrica,N/A,Día 62,A Tiempo (Objetivo)
+MRSU6521018,MAERSK BINTAN,55,70,Directo a Fábrica,N/A,Día 65,A Tiempo (Objetivo)
+MRSU5914350,MAERSK BATUR / 637S,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU3834148,MAERSK BATUR / 637S,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+SEKU4627585,MAERSK BATUR / 637S,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCLU5418706,MAERSK BATUR / 637S,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MSKU1418238,MAERSK BATUR / 637S,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU7743344,MAERSK BATUR / 637S,62,74,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU5912925,MAERSK BATUR / 637S,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU4774420,MAERSK BATUR / 637S,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CAAU7952060,MAERSK BATUR / 637S,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TRHU4489558,EA BAYANO 641E,65,75,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+SUDU6580939,CAP SAN SOUNIO,75,85,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU6876091,CAP SAN SOUNIO,75,85,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU4974205,CAP SAN SOUNIO,75,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU3692375,MAERSK BRATAN,75,85,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU2895130,MAERSK BRATAN,75,88,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU5496371,MAERSK BRATAN,75,85,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU3842523,MAERSK BAYETE,76,86,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+BMOU4090750,MAERSK BAYETE,76,86,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+HASU4849245,MAERSK BAYETE,76,86,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+HASU4229080,MAERSK BAYETE,76,86,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU6371155,MAERSK BAYETE,76,86,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU5986466,MAERSK BAYETE,76,86,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU1521077,MAERSK BAYETE,76,86,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TRHU7936752,MAERSK BAYETE,76,86,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU5418065,EA BAYANO 643E,79,89,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TLLU4477385,EA BAYANO 643E,79,89,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CAIU7229562,SPIRIT OF MELBOURNE,82,94,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCKU7275295,SPIRIT OF MELBOURNE,82,92,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU2813983,SPIRIT OF MELBOURNE,82,92,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+SUDU8613707,SPIRIT OF MELBOURNE,82,94,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CAAU8494505,SPIRIT OF MELBOURNE,82,92,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+HASU4047574,SPIRIT OF MELBOURNE,82,92,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU6398454,(EA TITICACA / 644E,89,99,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU6409710,(EA TITICACA / 644E,89,99,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CIPU5067961,SAN FELIPE,90,100,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU3280383,SAN FELIPE,90,100,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU4261768,SAN FELIPE,90,100,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU2112641,SAN FELIPE,90,100,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CAAU8508086,SAN FELIPE,90,102,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU3971765,MAERSK INVERNESS / 641N,96,106,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU2889544,MAERSK INVERNESS / 641N,96,106,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+SUDU8504141,MAERSK INVERNESS / 641N,96,106,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU6037464,MAERSK INVERNESS / 641N,96,106,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU3454805,MAERSK INVERNESS / 641N,96,106,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU6240319,MAERSK INVERNESS / 641N,96,106,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+SUDU8502637,MAERSK INVERNESS / 641N,96,106,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CAAU7560644,MAERSK INVERNESS / 641N,96,106,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU2880765,MAERSK INVERNESS / 641N,96,106,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+BSIU8059384,MAERSK INVERNESS / 641N,96,106,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCKU6879496,MAERSK INVERNESS / 641N,96,106,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU3108970,EA TITICACA / 646E,103,113,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU3213644,EA TITICACA / 646E,103,113,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+SUDU8824464,EA TITICACA / 646E,103,113,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TLLU4089287,EA TITICACA / 646E,103,113,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU6209250,EA TITICACA / 646E,103,113,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU5190954,EA TITICACA / 646E,103,113,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TGBU5362986,EA TITICACA / 646E,103,113,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TEMU8101060,EA TITICACA / 646E,103,113,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU7297371,SPIRIT OF AUCKLAND / 642N,103,113,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU4453776,SPIRIT OF AUCKLAND / 642N,103,113,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MSKU0208284,SPIRIT OF AUCKLAND / 642N,103,113,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TGBU6141758,SPIRIT OF AUCKLAND / 642N,103,113,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRSU3158151,SPIRIT OF AUCKLAND / 642N,103,113,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+UETU7505845,SPIRIT OF AUCKLAND / 642N,103,113,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+SUDU6604748,SPIRIT OF AUCKLAND / 642N,103,113,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU3968118,SPIRIT OF AUCKLAND / 642N,103,113,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU2874288,MAERSK SEOUL 641w,110,120,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU6362309,MAERSK WILLEMSTADT,110,120,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU6174908,MAERSK BENGUELA / 644S,111,121,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCLU6672823,SALVADOR EXPRESS,113,123,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+FANU3193229,SALVADOR EXPRESS,113,123,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+GCXU6166497,SALVADOR EXPRESS,113,123,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+BEAU4460505,SALVADOR EXPRESS,113,123,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+HASU4647769,MAERSK BRANI,117,127,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+HLBU1199550,ISTAMBUL EXPRESS,120,130,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+HLBU1202994,ISTAMBUL EXPRESS,120,130,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU2750374,MAERSK SEOUL,130,140,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+NYKU3839353,MSC VALENTINA FA639A,99,109,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+ECMU4925074,CMA CGM WISDOM,0,10,Directo a Fábrica,N/A,Día 7,A Tiempo (Objetivo)
+CMAU4603840,CMA CGM WISDOM,0,10,Directo a Fábrica,N/A,Día 7,A Tiempo (Objetivo)
+FFAU4445316,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+CMAU7591553,CMA CGM POINTE-NOIRE,41,56,Directo a Fábrica,N/A,Día 48,A Tiempo (Objetivo)
+FCIU8515050,CMA CGM POINTE-NOIRE,41,56,Directo a Fábrica,N/A,Día 51,A Tiempo (Objetivo)
+TIIU4916742,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+TGBU5073670,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 49,A Tiempo (Objetivo)
+CMAU8818533,CMA CGM WISDOM,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TXGU8288308,CMA CGM WISDOM,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+FFAU4783761,CMA CGM WISDOM,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+SEKU6328109,CMA CGM WISDOM,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TLLU4655450,CMA CGM WISDOM,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TLLU4869318,CMA CGM EXCELLENCE,76,86,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU6697392,CMA CGM EXEMPLARITY,83,93,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+ECMU7372732,CMA CGM BOLDNESS,97,107,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TXGU7998199,CMA CGM BOLDNESS,97,107,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU3998114,CMA CGM BOLDNESS,97,107,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+APHU7353990,CMA CGM POINTE-NOIRE,104,114,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU6708250,CMA CGM BETTER WAYS,111,121,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TGBU6539572,CMA CGM HARMONY,118,128,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+FFAU7179890,MAERSK CHACHAI,45,59,Directo a Fábrica,N/A,Día 55,A Tiempo (Objetivo)
+MRSU3862284,MAERSK PANGANI,60,70,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MRKU9343426,(MSC YAMUNA VI / 640S,70,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCKU2922510,MSC MAGNUM VII,49,64,Directo a Fábrica,N/A,Día 56,A Tiempo (Objetivo)
+MRKU8359578,MAERSK KARUN / 641S,77,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TLLU4407623,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+MAGU5740149,CMA CGM POINTE-NOIRE,41,55,Directo a Fábrica,N/A,Día 49,A Tiempo (Objetivo)
+TCNU5725736,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 48,A Tiempo (Objetivo)
+BEAU4034480,CMA CGM POINTE-NOIRE,41,59,Directo a Fábrica,N/A,Día 51,A Tiempo (Objetivo)
+FSCU8380307,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 51,A Tiempo (Objetivo)
+APHU7041409,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 48,A Tiempo (Objetivo)
+CMAU8945878,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 49,A Tiempo (Objetivo)
+CMAU4541538,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+SEKU5883180,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+TCKU6478940,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+TLLU8908198,CMA CGM POINTE-NOIRE,41,59,Suppla Rionegro,Día 51,Día 51,A Tiempo (Objetivo)
+ECMU5295719,CMA CGM MERCANTOUR,41,59,Directo a Fábrica,N/A,Día 49,A Tiempo (Objetivo)
+TCNU2296073,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 48,A Tiempo (Objetivo)
+CMAU4806940,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+TGBU5205483,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 49,A Tiempo (Objetivo)
+TLLU4779240,CMA CGM POINTE-NOIRE,41,55,Directo a Fábrica,N/A,Día 51,A Tiempo (Objetivo)
+APHU7360279,CMA CGM POINTE-NOIRE,41,74,Directo a Fábrica,N/A,Día 48,A Tiempo (Objetivo)
+MAGU5725843,CMA CGM MERCANTOUR,41,51,Directo a Fábrica,N/A,Día 48,A Tiempo (Objetivo)
+CMAU7078448,CMA CGM POINTE-NOIRE,41,55,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+TGBU6814695,CMA CGM POINTE-NOIRE,41,60,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+TIIU4068370,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 48,A Tiempo (Objetivo)
+CMAU7181517,CMA CGM POINTE-NOIRE,41,60,Directo a Fábrica,N/A,Día 49,A Tiempo (Objetivo)
+TCKU7899769,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 49,A Tiempo (Objetivo)
+TGBU5064575,CMA CGM POINTE-NOIRE,41,59,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+CAAU5706600,CMA CGM POINTE-NOIRE,41,56,Directo a Fábrica,N/A,Día 49,A Tiempo (Objetivo)
+CMAU6695888,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 51,A Tiempo (Objetivo)
+UETU5555195,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 48,A Tiempo (Objetivo)
+TCNU3610825,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 51,A Tiempo (Objetivo)
+SEKU6028415,CMA CGM POINTE-NOIRE,41,54,Directo a Fábrica,N/A,Día 49,A Tiempo (Objetivo)
+SEKU5860312,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+CMAU8429629,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 48,A Tiempo (Objetivo)
+TLLU4726410,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 49,A Tiempo (Objetivo)
+CMAU9314434,CMA CGM POINTE-NOIRE,41,61,Directo a Fábrica,N/A,Día 51,A Tiempo (Objetivo)
+TRHU7427436,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 48,A Tiempo (Objetivo)
+CMAU4662144,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 49,A Tiempo (Objetivo)
+FCIU8969216,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 49,A Tiempo (Objetivo)
+TCNU6843219,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 48,A Tiempo (Objetivo)
+BMOU6399522,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 51,A Tiempo (Objetivo)
+BMOU5650280,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 48,A Tiempo (Objetivo)
+BEAU4104058,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 49,A Tiempo (Objetivo)
+CMAU8579059,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 51,A Tiempo (Objetivo)
+TCNU2709032,CMA CGM POINTE-NOIRE,41,56,Directo a Fábrica,N/A,Día 51,A Tiempo (Objetivo)
+CMAU9702358,CMA CGM POINTE-NOIRE,41,51,Directo a Fábrica,N/A,Día 50,A Tiempo (Objetivo)
+TCLU1844278,CMA CGM BETTER WAYS,48,59,Directo a Fábrica,N/A,Día 55,A Tiempo (Objetivo)
+TCLU9688490,CMA CGM BETTER WAYS,48,58,Directo a Fábrica,N/A,Día 57,A Tiempo (Objetivo)
+SEGU4732884,CMA CGM BETTER WAYS,48,58,Directo a Fábrica,N/A,Día 56,A Tiempo (Objetivo)
+ECMU5610723,CMA CGM BETTER WAYS,48,58,Directo a Fábrica,N/A,Día 55,A Tiempo (Objetivo)
+ECMU7263794,CMA CGM BETTER WAYS,48,73,Directo a Fábrica,N/A,Día 55,A Tiempo (Objetivo)
+ECMU7459642,CMA CGM BETTER WAYS,48,59,Directo a Fábrica,N/A,Día 55,A Tiempo (Objetivo)
+TGBU4930844,CMA CGM BETTER WAYS,48,60,Directo a Fábrica,N/A,Día 55,A Tiempo (Objetivo)
+TCNU1767899,CMA CGM BETTER WAYS,48,58,Directo a Fábrica,N/A,Día 56,A Tiempo (Objetivo)
+CMAU4333600,CMA CGM BETTER WAYS,48,70,Directo a Fábrica,N/A,Día 55,A Tiempo (Objetivo)
+TCLU5530948,CMA CGM BETTER WAYS,48,59,Directo a Fábrica,N/A,Día 55,A Tiempo (Objetivo)
+TCKU6322216,CMA CGM WISDOM,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+FFAU1217565,CMA CGM WISDOM,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU4999644,CMA CGM WISDOM,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TGBU4325782,CMA CGM WISDOM,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU8653393,CMA CGM WISDOM,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+APHU6685259,CMA CGM WISDOM,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU4407956,CMA CGM WISDOM,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU9667370,CMA CGM WISDOM,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CAAU6333970,CMA CGM WISDOM,62,73,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU7468723,CMA CGM WISDOM,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+SEGU5878852,CMA CGM WISDOM,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU8843346,CMA CGM WISDOM,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU7984632,CMA CGM WISDOM,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU2381745,CMA CGM WISDOM,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU6102494,CMA CGM IMAGINATION,69,79,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU8482705,CMA CGM IMAGINATION,69,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU3590251,CMA CGM IMAGINATION,69,79,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CAIU7187446,CMA CGM IMAGINATION,69,79,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+APHU7351744,CMA CGM IMAGINATION,69,79,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU7558302,CMA CGM IMAGINATION,69,80,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU6928580,CMA CGM IMAGINATION,69,79,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU5959626,CMA CGM IMAGINATION,69,79,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+SEKU4529486,CMA CGM IMAGINATION,69,79,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TGBU6801635,CMA CGM IMAGINATION,69,78,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+SEKU6075417,CMA CGM IMAGINATION,69,79,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU2931287,CMA CGM IMAGINATION,69,79,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCKU7829139,CMA CGM IMAGINATION,69,79,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU8749284,CMA CGM IMAGINATION,69,79,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU7278390,CMA CGM IMAGINATION,69,79,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+SEGU6288043,CMA CGM IMAGINATION,69,79,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TRHU6501333,CMA CGM IMAGINATION,69,79,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU6455275,CMA CGM IMAGINATION,69,79,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+HPCU5376130,CMA CGM IMAGINATION,69,79,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+HPCU5373131,CMA CGM IMAGINATION,69,79,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TLLU8787408,CMA CGM IMAGINATION,69,79,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU8413746,CMA EXCELLENCE,76,86,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCKU7270837,CMA EXCELLENCE,76,86,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TGCU5421779,CMA EXCELLENCE,76,86,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TLLU4333840,CMA EXCELLENCE,76,87,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+HPCU5371268,CMA EXCELLENCE,76,86,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU6460348,FORT BOURBON,90,100,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+ECMU7566506,FORT BOURBON,90,100,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TRHU8286604,FORT BOURBON,90,100,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCLU5061814,FORT BOURBON,90,100,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU3219472,FORT BOURBON,90,100,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU5378051,FORT BOURBON,90,101,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU8472374,CMA CGM BOLDNESS,97,107,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+GAOU7928194,CARDIFF,99,109,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+GAOU6376660,CMA CGM POINTE-NOIRE,104,114,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+FSCU7249524,CMA CGM POINTE-NOIRE,104,114,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TXGU6678605,CMA CGM POINTE-NOIRE,104,114,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+BSIU8076993,CMA CGM POINTE-NOIRE,104,114,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+ECMU4907701,BUQUE_GEN,114,124,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TXGU8669726,BUQUE_GEN,114,124,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+HASU1348276,MAERSK BOGOR,41,51,Directo a Fábrica,N/A,Día 48,A Tiempo (Objetivo)
+MRSU5269088,MAERSK BULAN,41,55,Directo a Fábrica,N/A,Día 49,A Tiempo (Objetivo)
+MRKU6554636,MAERSK BENGUELA / 635S,58,64,Suppla Rionegro,Día 65,Día 65,Ruptura (Tarde)
+HASU1164704,MAERSK BATUR / 637S,62,73,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+SEKU4608348,MAERSK BAYETE,69,79,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+MSKU1888904,MAERSK BAYETE,69,79,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TXGU8851540,CMA CGM BETTER WAYS,48,60,Directo a Fábrica,N/A,Día 55,A Tiempo (Objetivo)
+TCLU5700392,CMA CGM BETTER WAYS,48,55,Directo a Fábrica,N/A,Día 55,A Tiempo (Objetivo)
+TGBU5427731,CMA CGM WISDOM,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU4135950,CMA EXCELLENCE,76,86,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+FFAU8053817,CMA CGM EXEMPLARITY,83,89,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+CMAU4846394,CMA CGM BOLDNESS,97,107,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+SEGU6316443,CMA CGM BETTER WAYS,48,59,Directo a Fábrica,N/A,Día 55,A Tiempo (Objetivo)
+SEGU4814426,CMA CGM BETTER WAYS,48,69,Directo a Fábrica,N/A,Día 55,A Tiempo (Objetivo)
+HPCU5371463,CMA CGM BETTER WAYS,48,68,Directo a Fábrica,N/A,Día 55,A Tiempo (Objetivo)
+APHU7302518,CMA CGM HARMONY,55,65,Directo a Fábrica,N/A,Día 63,A Tiempo (Objetivo)
+TGHU6399528,CMA CGM HARMONY,55,75,Directo a Fábrica,N/A,Día 62,A Tiempo (Objetivo)
+SEKU5886127,CMA CGM WISDOM,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU1404471,CMA CGM WISDOM,62,72,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU1203878,CMA CGM IMAGINATION,69,79,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+ECMU5352491,CMA EXCELLENCE,76,86,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte
+TCNU2103997,CMA CGM EXEMPLARITY,83,93,Fuera de Horizonte / Pendiente,N/A,N/A,Fuera de Horizonte

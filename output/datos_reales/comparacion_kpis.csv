@@ -1,0 +1,13 @@
+,linea_base,plan_optimizado
+n_containers,715.0,715.0
+n_no_atendidos_en_horizonte,135.0,78.0
+pct_dentro_objetivo,92.06896551724138,97.64521193092622
+pct_alerta_preventiva,2.2413793103448274,2.0408163265306123
+pct_alerta_critica,5.689655172413793,0.3139717425431711
+n_rupturas,92.0,4.0
+pct_via_suppla,17.202797202797203,2.237762237762238
+lead_time_promedio,8.38103448275862,8.381475667189953
+dias_totales_faltante_produccion,530.0,546.0
+inventario_suppla_promedio,17.066666666666666,0.044444444444444446
+inventario_sofasa_promedio,10.155555555555555,28.88888888888889
+max_cola_puerto,137.0,0.0

@@ -1,0 +1,8 @@
+﻿,id,eta,need_by,em,route,rupture_days,lead_time
+0,CONT-001,0,10,0,suppla,0,0
+1,CONT-002,1,8,2,suppla,0,1
+2,MANUAL-001,0,4,0,suppla,0,0
+3,MANUAL-002,1,8,2,suppla,0,1
+4,MANUAL-003,2,6,2,suppla,0,0
+5,MANUAL-004,3,15,4,suppla,0,1
+6,MANUAL-005,4,18,4,suppla,0,0
