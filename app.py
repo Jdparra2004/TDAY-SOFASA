@@ -5,7 +5,8 @@ import os
 import io
 from src.model import Container, Params
 from src.simulation import run_simulation, SimulationResult
-from src.optimization import optimize_plan
+from src.optimization import optimize_plan, baseline_plan
+from src.export import export_prescriptive_plan
 from src.data_processor import process_real_tracking_data, process_real_tracking_dataframe, load_and_clean_excel
 import src.visualize as viz
 

@@ -1217,60 +1217,39 @@ def process_real_tracking_dataframe(
     **extra: Any,
 ) -> pd.DataFrame:
     base_dt = pd.Timestamp(base_date).normalize() if base_date is not None else pd.Timestamp("2026-10-20")
-    folder_3nd = os.path.abspath("data/3nd Data")
     
-    # 1. Cargar Tracking.xlsx (Maestra, exactamente 550 IDs)
-    tracking_path = os.path.join(folder_3nd, "Tracking.xlsx")
-    if not os.path.exists(tracking_path):
-        # buscar otro archivo que contenga tracking
-        for fn in os.listdir(folder_3nd):
-            if "tracking" in fn.lower() and fn.endswith(SUPPORTED_EXT):
-                tracking_path = os.path.join(folder_3nd, fn)
-                break
+    if tracking_file is None and diel_file is None and prio_file is None:
+        if os.path.exists("data/3nd Data"):
+            tracking_file = os.path.abspath("data/3nd Data")
+        elif os.path.exists("data"):
+            tracking_file = os.path.abspath("data")
+        else:
+            raise ValueError("El Tracking es obligatorio: define el universo o sube un archivo.")
 
-    print(f"[FUENTE DATOS] Archivo maestro: {os.path.abspath(tracking_path)}")
-    xl_track = pd.ExcelFile(tracking_path)
-    sh_track = "Tracking" if "Tracking" in xl_track.sheet_names else xl_track.sheet_names[0]
-    df_track = xl_track.parse(sh_track)
-    print(f"  Hoja: {sh_track} | Filas crudas: {len(df_track)}")
+    srcs = _legacy_sources(tracking_file, diel_file, prio_file)
+    if not srcs:
+        if os.path.exists("data/3nd Data"):
+            tracking_file = os.path.abspath("data/3nd Data")
+            srcs = _legacy_sources(tracking_file, diel_file, prio_file)
+        else:
+            raise ValueError("El Tracking es obligatorio: no se encontraron fuentes de datos válidas.")
 
-    # Procesar tablas mediante build_dataset pero forzando master
-    srcs = [Source(tracking_path, tag="", master=True)]
-    diel_path = os.path.join(folder_3nd, "Programacion DIEL.xlsx")
-    if not os.path.exists(diel_path):
-        for fn in os.listdir(folder_3nd):
-            if ("diel" in fn.lower() or "programacion" in fn.lower()) and fn.endswith(SUPPORTED_EXT):
-                diel_path = os.path.join(folder_3nd, fn)
-                break
-    if os.path.exists(diel_path):
-        print(f"[FUENTE DATOS] Archivo apoyo DIEL: {os.path.abspath(diel_path)}")
-        xl_diel = pd.ExcelFile(diel_path)
-        diel_rows = sum(len(xl_diel.parse(sh)) for sh in xl_diel.sheet_names)
-        print(f"  Hojas: {xl_diel.sheet_names} | Filas crudas: {diel_rows}")
-        srcs.append(Source(diel_path, tag="diel"))
-
-    prio_path = os.path.join(folder_3nd, "Prioridades CKD.xlsx")
-    if not os.path.exists(prio_path):
-        for fn in os.listdir(folder_3nd):
-            if "prioridades" in fn.lower() and fn.endswith(SUPPORTED_EXT):
-                prio_path = os.path.join(folder_3nd, fn)
-                break
-    if os.path.exists(prio_path):
-        print(f"[FUENTE DATOS] Archivo apoyo Prioridades: {os.path.abspath(prio_path)}")
-        xl_prio = pd.ExcelFile(prio_path)
-        prio_rows = sum(len(xl_prio.parse(sh)) for sh in xl_prio.sheet_names)
-        print(f"  Hojas: {xl_prio.sheet_names} | Filas crudas: {prio_rows}")
-        srcs.append(Source(prio_path, tag="prio"))
-
-    bundle = build_dataset(srcs, include_untracked=False, base_date=base_dt, default_buffer_days=default_buffer_days, late_fix_days=late_fix_days)
+    bundle = build_dataset(srcs, include_untracked=include_untracked, base_date=base_dt, default_buffer_days=default_buffer_days, late_fix_days=late_fix_days)
     df = bundle.master
 
-    # Recopilar IDs de apoyo que NO están en Tracking para la hoja "No están en Tracking"
-    tracking_ids = set(bundle.table(sh_track, file=os.path.basename(tracking_path))["id"].dropna() if bundle.table(sh_track, file=os.path.basename(tracking_path)) is not None else df["id"].dropna())
+    master_table = None
+    for t in bundle.tables:
+        if t.status == "maestra":
+            master_table = t
+            break
+    if master_table is None and bundle.tables:
+        master_table = bundle.tables[0]
+
+    tracking_ids = set(master_table.ids if master_table and master_table.has_id else (df["id"].dropna() if "id" in df.columns else []))
     
     no_tracking_records = []
     for t in bundle.tables:
-        if t.file != os.path.basename(tracking_path) and t.has_id:
+        if t != master_table and t.has_id:
             for cid in t.ids:
                 if cid and pd.notna(cid) and cid not in tracking_ids:
                     no_tracking_records.append({"id": cid, "fuente": f"{t.file} / {t.label}"})
@@ -1293,10 +1272,12 @@ def process_real_tracking_data(tracking_file=None, diel_file=None, prio_file=Non
         return []
 
     unique_tracking_count = df["id"].dropna().nunique()
-    if unique_tracking_count != 550:
-        raise ValueError(f"Validacion fallida: Tracking de @data/3nd/ debe tener exactamente 550 contenedores únicos (tiene {unique_tracking_count})")
+    is_default_3nd = (tracking_file is None and diel_file is None and prio_file is None) or \
+                     (isinstance(tracking_file, (str, os.PathLike)) and "3nd Data" in str(tracking_file))
+    if is_default_3nd and unique_tracking_count != 550:
+        print(f"Advertencia: El Tracking detectado tiene {unique_tracking_count} contenedores únicos (esperado 550 en 3nd Data).")
 
-    prior_em_cols = [c for c in ["em_diel", "diel_em_diel", "fecha_em_prog", "prio_em_prog", "fecha_em_plan"] if c in df.columns]
+    prior_em_cols = [c for c in ["em", "em_diel", "diel_em_diel", "fecha_em_prog", "prio_em_prog", "fecha_em_plan"] if c in df.columns]
     is_already_in_plant = pd.Series(False, index=df.index)
     for col in prior_em_cols:
         dt_s = pd.to_datetime(df[col], errors="coerce")
@@ -1309,6 +1290,8 @@ def process_real_tracking_data(tracking_file=None, diel_file=None, prio_file=Non
     print(f"Contenedores excluidos (ya en planta antes del día 0): {len(excluded_df)}")
 
     containers: List[Container] = []
+    def _ok(v): return pd.notna(v) and str(v).strip() not in ("", "nan", "<NA>", "GEN", "N/D")
+
     for r in active_df.itertuples(index=False):
         c_id = str(getattr(r, "id", ""))
         eta = int(getattr(r, "eta_dia", 0))
@@ -1319,12 +1302,11 @@ def process_real_tracking_data(tracking_file=None, diel_file=None, prio_file=Non
         vessel = str(getattr(r, "vessel", "N/D"))
         if vessel in ("nan", "", "<NA>"):
             vessel = "N/D"
-        orig = str(getattr(r, "prio_origen", getattr(r, "origen", "N/D")))
-        if orig in ("nan", "", "<NA>", "GEN"):
-            orig = "N/D"
+        
+        orig = next((str(v) for v in (getattr(r, "sourcing", None), getattr(r, "origen", None), getattr(r, "prio_origen", None)) if _ok(v)), "N/D")
 
         em_prev = None
-        for col in ["diel_em_diel", "fecha_em_prog", "prio_em_prog", "em_diel", "fecha_em_plan"]:
+        for col in ["em", "diel_em_diel", "fecha_em_prog", "prio_em_prog", "em_diel", "fecha_em_plan"]:
             val = getattr(r, col, None) if hasattr(r, col) else None
             if pd.notna(val):
                 dt_val = pd.to_datetime(val, errors="coerce")

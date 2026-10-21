@@ -75,6 +75,7 @@ def optimize_plan(
     em_day: Dict[str, cp_model.IntVar] = {}
     suppla_in_day: Dict[str, cp_model.IntVar] = {}
     r_slack: Dict[str, cp_model.IntVar] = {}   # incumplimiento de need_by
+    o_slack: Dict[str, cp_model.IntVar] = {}   # incumplimiento de em_objetivo
     s_slack: Dict[str, cp_model.IntVar] = {}   # incumplimiento de l_max (demurrage)
     a_slack: Dict[str, cp_model.IntVar] = {}   # incumplimiento de l_obj (alerta preventiva)
     suppla_days: Dict[str, cp_model.IntVar] = {}
@@ -283,3 +284,37 @@ def _compute_plan_kpis(containers: List[Container], plan: Plan, params: Params) 
         "dias_contenedor_suppla": suppla_days_total,
         "lead_time_promedio": sum(lead_times) / n,
     }
+
+
+def baseline_plan(containers: List[Container], params: Params) -> Plan:
+    cap_s = params.cap_sofasa()
+    cap_t = params.cap_traslado()
+    cap_w = params.cap_suppla_weekly()
+    H = params.horizon
+    used_s, used_t, used_w, plan = [0]*H, [0]*H, {}, {}
+    key = lambda c: (c.em_objetivo if c.em_objetivo is not None else c.need_by, c.need_by)
+    for c in sorted(containers, key=key):
+        tgt = max(0, c.eta + params.l_min, c.em_objetivo if c.em_objetivo is not None else c.need_by)
+        d = next((t for t in range(tgt, H) if used_s[t] < cap_s[t]), None)
+        if d is not None and d - c.eta <= params.l_max:
+            used_s[d] += 1
+            plan[c.id] = PlanEntry(c.id, "direct", d)
+            continue
+        placed = False
+        for s in range(max(0, c.eta), min(H, c.eta + params.l_max + 1)):
+            w = params.week_of(s)
+            if used_w.get(w, 0) >= cap_w[w]:
+                continue
+            e = next((t for t in range(s + params.min_suppla_stay_days, H) if used_t[t] < cap_t[t] and used_s[t] < cap_s[t]), None)
+            if e is None:
+                continue
+            used_w[w] = used_w.get(w, 0) + 1
+            used_t[e] += 1
+            used_s[e] += 1
+            plan[c.id] = PlanEntry(c.id, "suppla", e, s)
+            placed = True
+            break
+        if not placed and d is not None:
+            used_s[d] += 1
+            plan[c.id] = PlanEntry(c.id, "direct", d)
+    return plan

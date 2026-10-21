@@ -92,7 +92,7 @@ class Params:
     # --- inventario inicial y consumo de producción ---
     init_inv_sofasa: int = 0
     init_inv_suppla: int = 0
-    daily_consumption: Union[Number, Sequence[Number]] = 12  # contenedores-equivalentes/día
+    daily_consumption: Union[Number, Sequence[Number]] = 0  # sin consumo inventado por defecto
 
     # --- ventana máxima de espera que el optimizador puede considerar ---
     max_wait_days: int = 30  # tope de días desde ETA para restringir el tamaño del modelo
