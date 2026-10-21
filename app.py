@@ -218,7 +218,8 @@ elif st.session_state.view == "manual":
                 cap_sofasa_per_day=cap_sofasa_m,
                 cap_suppla_per_week=cap_suppla_m,
                 cap_traslado_per_day=cap_traslado_m,
-                transfer_days_allowed=transfer_days_idx_m
+                transfer_days_allowed=transfer_days_idx_m,
+                start_weekday=get_base_date().weekday(),
             )
             base_res = run_simulation(st.session_state.manual_containers, params, plan=None)
             opt_res = optimize_plan(st.session_state.manual_containers, params, time_limit_s=15)
@@ -309,6 +310,12 @@ elif st.session_state.view == "lote":
         st.subheader("Carga Interactiva de Archivos Excel")
         st.markdown("Suba los archivos Excel correspondientes (Tracking, Programación DIEL, Prioridades CKD). Los datos se procesan en su totalidad.")
 
+        planning_date = st.date_input(
+            "Fecha de Planeación (Día 0)",
+            value=pd.Timestamp("2026-10-20").date(),
+            help="Fecha de referencia (Día 0) para iniciar la simulación y el horizonte de planeación."
+        )
+
         col_f1, col_f2, col_f3 = st.columns(3)
         with col_f1:
             uploaded_tracking = st.file_uploader("Tracking de Contenedores (.xlsx)", type=["xlsx", "xls"])
@@ -323,7 +330,8 @@ elif st.session_state.view == "lote":
                     df_raw_bundle = process_real_tracking_dataframe(
                         tracking_file=uploaded_tracking,
                         diel_file=uploaded_diel,
-                        prio_file=uploaded_prio
+                        prio_file=uploaded_prio,
+                        base_date=pd.Timestamp(planning_date)
                     )
                     base_dt = df_raw_bundle.attrs.get("base_date", pd.Timestamp("2026-01-01"))
                     st.session_state.base_date = base_dt
@@ -367,8 +375,8 @@ elif st.session_state.view == "lote":
             df_temp = pd.DataFrame([vars(c) for c in st.session_state.real_containers])
             if not df_temp.empty:
                 max_need = int(df_temp['need_by'].max())
-                min_eta = int(df_temp['eta'].min())
-                default_horizon = max(45, max_need - min_eta + 15)
+                min_eta = max(0, int(df_temp['eta'].min()))
+                default_horizon = min(365, max(45, max_need - min_eta + 15))
 
         horizon_lote = st.slider("Horizonte de Planeación (días)", 0, 365, default_horizon, key="h_l", help="Número total de días que simulará y optimizará el modelo en lote.")
 
@@ -394,7 +402,8 @@ elif st.session_state.view == "lote":
                         cap_sofasa_per_day=cap_sofasa_lote,
                         cap_suppla_per_week=cap_suppla_lote,
                         cap_traslado_per_day=cap_traslado_lote,
-                        transfer_days_allowed=transfer_days_idx
+                        transfer_days_allowed=transfer_days_idx,
+                        start_weekday=get_base_date().weekday(),
                     )
                     containers = st.session_state.real_containers
                     
@@ -547,10 +556,20 @@ elif st.session_state.view == "lote":
                             else:
                                 risk = "A Tiempo (Objetivo)"
                         else:
-                            route_desc = "Fuera de Horizonte / Pendiente"
-                            suppla_in_desc = "N/A"
-                            em_desc = "N/A"
-                            risk = "Fuera de Horizonte"
+                            ids_dif = set(getattr(opt_data, "deferred", []))
+                            ids_fuera = set(getattr(opt_data, "out_of_horizon", []))
+                            horizon_ = st.session_state.lote_params.horizon
+                            suppla_in_desc = em_desc = "N/A"
+                            if cid in ids_dif:
+                                route_desc = "Diferido: sin cupo en el horizonte"
+                                risk = ("Ruptura probable (sin cupo)" if need_val < horizon_
+                                        else "Diferido (sin ruptura en el horizonte)")
+                            elif cid in ids_fuera:
+                                route_desc = "Fuera de horizonte (llega después)"
+                                risk = "Fuera de Horizonte"
+                            else:
+                                route_desc = "Sin asignar por el solver"
+                                risk = "Sin plan"
 
                         rows_rec.append({
                             "ID Contenedor": cid,

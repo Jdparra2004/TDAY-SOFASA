@@ -362,19 +362,166 @@ def plot_sankey_comparison(
             _sankey_trace(opt_result, (o_lo, o_hi), show_container_labels),
         ]
     )
-    fig.update_layout(
-        title_text="Flujo de contenedores: Línea Base vs. Plan Optimizado",
-        title_x=0.5,
-        font=dict(size=12),
-        annotations=[
-            dict(x=0.0, y=b_hi + 4 / plot_px, xref="paper", yref="paper", xanchor="left", yanchor="bottom",
-                 text=f"<b>{title_base}</b> · {n_b} contenedores", showarrow=False, font=dict(size=14)),
-            dict(x=0.0, y=o_hi + 4 / plot_px, xref="paper", yref="paper", xanchor="left", yanchor="bottom",
-                 text=f"<b>{title_opt}</b> · {n_o} contenedores", showarrow=False, font=dict(size=14)),
-        ],
-        margin=dict(t=margin_t, l=20, r=20, b=margin_b),
-        height=plot_px + margin_t + margin_b,
-        paper_bgcolor="white",
-        plot_bgcolor="white",
-    )
-    return fig
+def export_prescriptive_plan_excel(
+    opt_result,
+    containers,
+    base_result,
+    params,
+    base_date: pd.Timestamp,
+    filename: str = "plan_prescriptivo_sofasa.xlsx",
+) -> str:
+    import openpyxl
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    from openpyxl.utils import get_column_letter
+
+    base = pd.Timestamp(base_date).normalize()
+    plan = opt_result.plan
+
+    # Sheet 1: Programación semanal
+    rows_prog = []
+    for c in containers:
+        entry = plan.get(c.id) if plan else None
+        route = entry.route if entry else ("diferido" if c.id in opt_result.deferred else "fuera_horizonte")
+        em_day = entry.em_day if entry else None
+        suppla_in = entry.suppla_in_day if entry and entry.route == "suppla" else None
+        
+        em_date = (base + pd.Timedelta(days=em_day)).strftime("%Y-%m-%d") if em_day is not None else "N/A"
+        eta_date = (base + pd.Timedelta(days=c.eta)).strftime("%Y-%m-%d")
+        
+        port_exit = em_day if route == "direct" else (suppla_in if suppla_in is not None else em_day)
+        days_port = (port_exit - c.eta) if port_exit is not None else (params.horizon - c.eta)
+        lt = (em_day - c.eta) if em_day is not None else None
+
+        alerts = []
+        if lt is not None and lt < params.l_min:
+            alerts.append("Riesgo de incumplimiento operativo: programación por debajo del tiempo mínimo estándar puerto-planta.")
+        if lt is not None and lt > params.l_obj:
+            alerts.append("Programación por encima del estándar objetivo puerto-planta.")
+        if days_port > params.l_max:
+            alerts.append("Riesgo de demurrage: programación supera el tiempo máximo permitido en puerto.")
+        alert_str = " | ".join(alerts) if alerts else "Normal"
+
+        sem = (base.weekday() + (em_day or 0)) // 7 if em_day is not None else 99
+        rows_prog.append({
+            "Semana": f"Semana {sem + 1}",
+            "Ruptura": f"Semana {base.weekofyear if hasattr(base, 'weekofyear') else 1}",
+            "Contenedor": c.id,
+            "Buque": c.vessel,
+            "EM Plan": em_date,
+            "Origen": getattr(c, "part_family", "GEN"),
+            "ETD": "N/A",
+            "ETA": eta_date,
+            "Ruta": "Directo" if route == "direct" else ("Suppla" if route == "suppla" else route),
+            "Recepción Suppla": (base + pd.Timedelta(days=suppla_in)).strftime("%Y-%m-%d") if suppla_in is not None else "N/A",
+            "EM previa": "N/A",
+            "Cambió": "Sí",
+            "Lead Time": lt if lt is not None else "N/A",
+            "Días en puerto": days_port,
+            "Alertas": alert_str,
+            "Comentarios": "Programado" if entry else "Diferido / Fuera"
+        })
+    df_prog = pd.DataFrame(rows_prog)
+    if not df_prog.empty and "Semana" in df_prog.columns and "EM Plan" in df_prog.columns:
+        df_prog = df_prog.sort_values(by=["Semana", "EM Plan"])
+
+    # Sheet 2: Capacidad SOFASA
+    sofasa_used = {t: 0 for t in range(params.horizon)}
+    for entry in plan.values():
+        if entry.em_day is not None and entry.em_day < params.horizon:
+            sofasa_used[entry.em_day] += 1
+    cap_sofasa_arr = params.cap_sofasa()
+    rows_sofasa = []
+    for t in range(params.horizon):
+        d_str = (base + pd.Timedelta(days=t)).strftime("%Y-%m-%d")
+        cap = cap_sofasa_arr[t]
+        used = sofasa_used[t]
+        pct = (100 * used / cap) if cap > 0 else 0.0
+        rows_sofasa.append({
+            "Día": t,
+            "Fecha": d_str,
+            "Usado": used,
+            "Capacidad": cap,
+            "% Utilización": round(pct, 1)
+        })
+    df_sofasa = pd.DataFrame(rows_sofasa)
+
+    # Sheet 3: Capacidad Suppla
+    suppla_weeks_used = {}
+    for entry in plan.values():
+        if entry.route == "suppla" and entry.suppla_in_day is not None:
+            w = params.week_of(entry.suppla_in_day)
+            suppla_weeks_used[w] = suppla_weeks_used.get(w, 0) + 1
+    cap_suppla_w = params.cap_suppla_weekly()
+    rows_suppla = []
+    for w in range(len(cap_suppla_w)):
+        received = suppla_weeks_used.get(w, 0)
+        cap = cap_suppla_w[w]
+        pct = (100 * received / cap) if cap > 0 else 0.0
+        rows_suppla.append({
+            "Semana Calendario": w + 1,
+            "Recibidos": received,
+            "Capacidad": cap,
+            "% Utilización": round(pct, 1)
+        })
+    df_suppla = pd.DataFrame(rows_suppla)
+
+    # Sheet 4: Traslados Suppla-SOFASA
+    traslados_used = {t: 0 for t in range(params.horizon)}
+    for entry in plan.values():
+        if entry.route == "suppla" and entry.em_day is not None and entry.em_day < params.horizon:
+            traslados_used[entry.em_day] += 1
+    cap_traslado_arr = params.cap_traslado()
+    rows_traslado = []
+    for t in range(params.horizon):
+        d_str = (base + pd.Timedelta(days=t)).strftime("%Y-%m-%d")
+        cap = cap_traslado_arr[t]
+        prog = traslados_used[t]
+        rows_traslado.append({
+            "Día": t,
+            "Fecha": d_str,
+            "Programados": prog,
+            "Capacidad": cap
+        })
+    df_traslado = pd.DataFrame(rows_traslado)
+
+    # Sheet 5: Riesgo Demurrage
+    rows_dem = [r for r in rows_prog if r["Días en puerto"] >= 11]
+    df_dem = pd.DataFrame(rows_dem) if rows_dem else pd.DataFrame(columns=["Contenedor", "Días en puerto", "Alertas"])
+
+    # Sheet 6: Riesgo Ruptura
+    rows_rup = [r for r in rows_prog if "Ruptura" in str(r["Comentarios"]) or r["Lead Time"] == "N/A"]
+    df_rup = pd.DataFrame(rows_rup) if rows_rup else pd.DataFrame(columns=["Contenedor", "Comentarios"])
+
+    # Sheet 7: Diferidos y fuera de ventana
+    rows_dif = [{"Contenedor": cid, "Motivo": "Diferido por capacidad"} for cid in opt_result.deferred]
+    rows_dif += [{"Contenedor": cid, "Motivo": "Llega a puerto en el horizonte, no alcanza a entrar"} for cid in opt_result.out_of_horizon]
+    df_dif = pd.DataFrame(rows_dif) if rows_dif else pd.DataFrame(columns=["Contenedor", "Motivo"])
+
+    # Sheet 8: KPIs
+    df_kpi = pd.DataFrame({
+        "Métrica": list(opt_result.kpis.keys()),
+        "Valor Optimizado": list(opt_result.kpis.values()),
+        "Solver Status": [opt_result.status] * len(opt_result.kpis),
+        "Solver Gap (%)": [round(opt_result.gap * 100, 2)] * len(opt_result.kpis),
+        "Objective Bound": [opt_result.best_objective_bound] * len(opt_result.kpis)
+    })
+
+    # Sheet 9: Parámetros y validaciones
+    df_params = pd.DataFrame({
+        "Parámetro": ["Horizonte", "Capacidad SOFASA/día", "Capacidad Suppla/semana", "Capacidad Traslado/día", "L_min", "L_obj", "L_max"],
+        "Valor": [params.horizon, str(params.cap_sofasa_per_day), str(params.cap_suppla_per_week), str(params.cap_traslado_per_day), params.l_min, params.l_obj, params.l_max]
+    })
+
+    with pd.ExcelWriter(filename, engine='openpyxl') as writer:
+        df_prog.to_excel(writer, sheet_name="Programación semanal", index=False)
+        df_sofasa.to_excel(writer, sheet_name="Capacidad SOFASA", index=False)
+        df_suppla.to_excel(writer, sheet_name="Capacidad Suppla", index=False)
+        df_traslado.to_excel(writer, sheet_name="Traslados Suppla-SOFASA", index=False)
+        df_dem.to_excel(writer, sheet_name="Riesgo Demurrage", index=False)
+        df_rup.to_excel(writer, sheet_name="Riesgo Ruptura", index=False)
+        df_dif.to_excel(writer, sheet_name="Diferidos y fuera de ventana", index=False)
+        df_kpi.to_excel(writer, sheet_name="KPIs", index=False)
+        df_params.to_excel(writer, sheet_name="Parámetros y validaciones", index=False)
+
+    return filename
+

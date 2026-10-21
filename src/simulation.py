@@ -67,10 +67,28 @@ def run_simulation(
 
     def heuristic_step(t, sofasa_remaining, suppla_week_remaining, traslado_remaining):
         for c in containers:
-            if c.eta == t:
+            # ETA < 0: ya estaba en puerto antes del día 0 -> entra a la cola el primer día
+            if c.eta == t or (t == 0 and c.eta < 0):
                 pending_port.append(c.id)
 
-        # priorizar por urgencia: contenedores con need_by más próxima primero
+        # 1. Asignar primero traslados Suppla -> SOFASA (hasta cap_traslado, lun-vie, permanente al menos 1 día en Suppla) por urgencia (need_by o em_objetivo)
+        suppla_wait.sort(key=lambda cid: state[cid]["container"].need_by)
+        still_waiting = []
+        for cid in suppla_wait:
+            c = state[cid]["container"]
+            suppla_in_day = state[cid]["suppla_in"]
+            can_transfer = (suppla_in_day is not None and (t - suppla_in_day >= params.min_suppla_stay_days)) and (params.weekday_of(t) in params.transfer_days_allowed)
+            if can_transfer and traslado_remaining > 0 and sofasa_remaining > 0:
+                state[cid]["em"] = t
+                traslado_remaining -= 1
+                sofasa_remaining -= 1
+                suppla_inv.get(1)
+                sofasa_inv.put(1)
+            else:
+                still_waiting.append(cid)
+        suppla_wait[:] = still_waiting
+
+        # 2. Luego ingreso directo desde puerto
         pending_port.sort(key=lambda cid: state[cid]["container"].need_by)
         still_pending = []
         for cid in pending_port:
@@ -89,18 +107,6 @@ def run_simulation(
                 still_pending.append(cid)  # congestión: se queda esperando cupo
         pending_port[:] = still_pending
 
-        suppla_wait.sort(key=lambda cid: state[cid]["container"].need_by)
-        still_waiting = []
-        for cid in suppla_wait:
-            if traslado_remaining > 0 and sofasa_remaining > 0:
-                state[cid]["em"] = t
-                traslado_remaining -= 1
-                sofasa_remaining -= 1
-                suppla_inv.get(1)
-                sofasa_inv.put(1)
-            else:
-                still_waiting.append(cid)
-        suppla_wait[:] = still_waiting
         return sofasa_remaining, suppla_week_remaining, traslado_remaining
 
     def plan_step(t):
@@ -119,8 +125,8 @@ def run_simulation(
         for t in range(params.horizon):
             sofasa_remaining = cap_sofasa[t]
             traslado_remaining = cap_traslado[t]
-            if t % 7 == 0:
-                suppla_week_remaining = cap_suppla_week[t // 7]
+            if t == 0 or params.weekday_of(t) == 0:   # inicia semana calendario (lunes)
+                suppla_week_remaining = cap_suppla_week[params.week_of(t)]
 
             if plan is None:
                 sofasa_remaining, suppla_week_remaining, traslado_remaining = heuristic_step(

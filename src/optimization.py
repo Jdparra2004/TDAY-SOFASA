@@ -8,19 +8,12 @@ Modelo de optimización (MILP / CP) para decidir, por cada contenedor:
 
 Implementado con **OR-Tools CP-SAT** (Google), el motor estándar de la
 industria para problemas de *scheduling* / asignación con restricciones de
-capacidad -- exactamente la naturaleza de este problema. Se prefiere sobre
-un MILP genérico (p.ej. PuLP+CBC) porque:
-  - Maneja nativamente variables enteras/booleanas y restricciones
-    condicionales (`OnlyEnforceIf`) sin necesitar trucos de "big-M".
-  - Suele resolver instancias de scheduling de este tamaño mucho más rápido.
-  - No requiere un solver externo: el solver CP-SAT viene incluido.
-
-Ver MODELO_MATEMATICO.md sección 4-6 para la formulación matemática completa
-que este código implementa.
+capacidades duras -- exactamente la naturaleza de este problema.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+import math
+from dataclasses import dataclass, field
 from typing import Dict, List
 
 from ortools.sat.python import cp_model
@@ -33,8 +26,12 @@ class OptimizationResult:
     plan: Plan
     status: str
     objective_value: float
+    best_objective_bound: float
+    gap: float
     solve_time_s: float
     kpis: Dict[str, float]
+    out_of_horizon: List[str] = field(default_factory=list)  # ids que no caben en el horizonte
+    deferred: List[str] = field(default_factory=list)
 
 
 def optimize_plan(
@@ -50,43 +47,43 @@ def optimize_plan(
     cap_traslado = params.cap_traslado()
     cap_suppla_week = params.cap_suppla_weekly()
 
-    # Ventana factible de días por contenedor dentro del horizonte
+    # Ventana factible de días por contenedor. El día 0 es la fecha de planeación: un contenedor
+    # con ETA negativa ya está en puerto, así que no se puede decidir nada antes del día 0, pero su
+    # lead time y sus holguras SÍ se miden contra la ETA real (negativa).
     windows = {}
     active_containers = []
+    out_of_horizon: List[str] = []
     for c in containers:
-        start = c.eta
-        if start >= horizon or (start + params.l_min) >= horizon:
+        start = max(0, c.eta)                          # primer día en que se puede actuar
+        direct_start = max(0, c.eta + params.l_min)    # primer día en que puede entrar directo a planta
+        if direct_start >= horizon:
+            out_of_horizon.append(c.id)
             continue
-        end = min(horizon - 1, c.eta + params.max_wait_days)
-        direct_start = start + params.l_min
-        if end < direct_start:
-            end = direct_start
-        windows[c.id] = (start, min(horizon - 1, end))
+        end = min(horizon - 1, max(start + params.max_wait_days, direct_start))
+        windows[c.id] = (start, end, direct_start)
         active_containers.append(c)
 
-    if not active_containers and containers:
-        # Fallback si ninguno cumple estrictamente, tomar los primeros con margen
-        for c in containers:
-            start = min(c.eta, horizon - 1)
-            direct_start = min(start + params.l_min, horizon - 1)
-            end = min(horizon - 1, start + params.max_wait_days)
-            windows[c.id] = (start, max(start, end))
-            active_containers.append(c)
+    if not active_containers:
+        return OptimizationResult(plan={}, status="NO_CONTAINERS_IN_HORIZON", objective_value=float("nan"),
+                                  solve_time_s=0.0, kpis={}, out_of_horizon=out_of_horizon)
 
     yd: Dict[tuple, cp_model.IntVar] = {}  # (c.id, t) -> entra directo a SOFASA el día t
     zs: Dict[tuple, cp_model.IntVar] = {}  # (c.id, t) -> recibido en Suppla el día t
     ys: Dict[tuple, cp_model.IntVar] = {}  # (c.id, t) -> transferido Suppla->SOFASA el día t
     use_suppla: Dict[str, cp_model.IntVar] = {}
+    pending: Dict[str, cp_model.IntVar] = {}   # 1 = se difiere fuera del horizonte
     em_day: Dict[str, cp_model.IntVar] = {}
     suppla_in_day: Dict[str, cp_model.IntVar] = {}
     r_slack: Dict[str, cp_model.IntVar] = {}   # incumplimiento de need_by
     s_slack: Dict[str, cp_model.IntVar] = {}   # incumplimiento de l_max (demurrage)
     a_slack: Dict[str, cp_model.IntVar] = {}   # incumplimiento de l_obj (alerta preventiva)
     suppla_days: Dict[str, cp_model.IntVar] = {}
+    late: Dict[str, cp_model.IntVar] = {}      # 1 = el contenedor termina en ruptura
 
     for c in active_containers:
-        start, end = windows[c.id]
-        direct_start = max(start + params.l_min, start)
+        start, end, direct_start = windows[c.id]
+        # cota superior de las holguras (la ETA/need_by pueden ser negativas)
+        big = horizon + max(0, -c.eta) + max(0, -c.need_by) + 1
 
         yd_terms = []
         for t in range(direct_start, end + 1):
@@ -108,35 +105,49 @@ def optimize_plan(
 
         u = model.NewBoolVar(f"use_suppla_{c.id}")
         use_suppla[c.id] = u
+        pend = model.NewBoolVar(f"pend_{c.id}")
+        pending[c.id] = pend
 
-        # (R1) exactamente una ruta de llegada a planta
-        model.Add(sum(yd_terms) + sum(ys_terms) == 1)
-        # el uso de Suppla queda determinado por si se usó la ruta ys
+        # (R1) o entra por una ruta dentro del horizonte, o se difiere
+        model.Add(sum(yd_terms) + sum(ys_terms) + pend == 1)
         model.Add(sum(ys_terms) == u)
         model.Add(sum(zs_terms) == u)
 
-        em = model.NewIntVar(start, end, f"em_{c.id}")
+        # un contenedor diferido se penaliza como si entrara el día `horizon`
+        em = model.NewIntVar(start, horizon, f"em_{c.id}")
         model.Add(em == sum(t * yd[(c.id, t)] for t in range(direct_start, end + 1))
-                  + sum(t * ys[(c.id, t)] for t in range(direct_start, end + 1)))
+                  + sum(t * ys[(c.id, t)] for t in range(direct_start, end + 1))
+                  + horizon * pend)
         em_day[c.id] = em
 
         sin_ = model.NewIntVar(0, end, f"suppla_in_{c.id}")
         model.Add(sin_ == sum(t * zs[(c.id, t)] for t in range(start, end + 1)))
         suppla_in_day[c.id] = sin_
 
-        # orden lógico: si se recibe en Suppla, la salida a planta es >= día de recepción
-        model.Add(em >= sin_)
+        # orden lógico: si se recibe en Suppla, la salida a planta es >= día de recepción + min_suppla_stay_days
+        model.Add(em >= sin_ + params.min_suppla_stay_days).OnlyEnforceIf(u)
+        model.Add(em >= sin_).OnlyEnforceIf(u.Not())
+
+        # DEMURRAGE RULE: demurrage is port waiting time (ETA -> day leaving port).
+        # port_exit_day = em if direct (u=0), or suppla_in_day if suppla (u=1)
+        port_exit = model.NewIntVar(start, horizon, f"port_exit_{c.id}")
+        model.Add(port_exit == em).OnlyEnforceIf(u.Not())
+        model.Add(port_exit == sin_).OnlyEnforceIf(u)
 
         # --- penalizaciones (slacks, min-forzado por el objetivo) ---
-        r = model.NewIntVar(0, horizon, f"r_{c.id}")
+        r = model.NewIntVar(0, big, f"r_{c.id}")
         model.Add(r >= em - c.need_by)
         r_slack[c.id] = r
 
-        s = model.NewIntVar(0, horizon, f"s_{c.id}")
-        model.Add(s >= em - c.eta - params.l_max)
+        l = model.NewBoolVar(f"late_{c.id}")
+        model.Add(r <= big * l)                # r > 0  =>  late = 1
+        late[c.id] = l
+
+        s = model.NewIntVar(0, big, f"s_{c.id}")
+        model.Add(s >= port_exit - c.eta - params.l_max)
         s_slack[c.id] = s
 
-        a = model.NewIntVar(0, horizon, f"a_{c.id}")
+        a = model.NewIntVar(0, big, f"a_{c.id}")
         model.Add(a >= em - c.eta - params.l_obj)
         a_slack[c.id] = a
 
@@ -145,8 +156,7 @@ def optimize_plan(
         model.Add(sd == 0).OnlyEnforceIf(u.Not())
         suppla_days[c.id] = sd
 
-    # --- (R4) capacidad diaria de recepción en SOFASA (con slack blando) ---
-    sofasa_slacks = {}
+    # --- (R4) capacidad diaria de recepción en SOFASA (dura) ---
     for t in range(horizon):
         terms = []
         for c in active_containers:
@@ -155,50 +165,35 @@ def optimize_plan(
             if (c.id, t) in ys:
                 terms.append(ys[(c.id, t)])
         if terms:
-            slack_t = model.NewIntVar(0, len(active_containers), f"sofasa_slack_{t}")
-            model.Add(sum(terms) <= int(round(cap_sofasa[t])) + slack_t)
-            sofasa_slacks[t] = slack_t
+            model.Add(sum(terms) <= int(round(cap_sofasa[t])))
 
-    # --- (R5) capacidad semanal de recepción en Suppla (con slack blando) ---
-    suppla_slacks = {}
-    n_weeks = len(cap_suppla_week)
-    for w in range(n_weeks):
-        t_start, t_end = w * 7, w * 7 + 6
-        terms = []
-        for c in active_containers:
-            for t in range(t_start, t_end + 1):
-                if (c.id, t) in zs:
-                    terms.append(zs[(c.id, t)])
+    # --- (R5) capacidad semanal (calendario) de recepción en Suppla (dura) ---
+    days_by_week: Dict[int, List[int]] = {}
+    for t in range(horizon):
+        days_by_week.setdefault(params.week_of(t), []).append(t)
+    for w, days in days_by_week.items():
+        terms = [zs[(c.id, t)] for c in active_containers for t in days if (c.id, t) in zs]
         if terms:
-            slack_w = model.NewIntVar(0, len(active_containers), f"suppla_slack_{w}")
-            model.Add(sum(terms) <= int(round(cap_suppla_week[w])) + slack_w)
-            suppla_slacks[w] = slack_w
+            model.Add(sum(terms) <= int(round(cap_suppla_week[w])))
 
-    # --- (R6) capacidad diaria de traslado Suppla -> SOFASA (con slack blando) ---
-    traslado_slacks = {}
+    # --- (R6) capacidad diaria de traslado Suppla -> SOFASA (dura) ---
     for t in range(horizon):
         terms = [ys[(c.id, t)] for c in active_containers if (c.id, t) in ys]
         if terms:
-            slack_tr = model.NewIntVar(0, len(active_containers), f"traslado_slack_{t}")
-            model.Add(sum(terms) <= int(round(cap_traslado[t])) + slack_tr)
-            traslado_slacks[t] = slack_tr
+            model.Add(sum(terms) <= int(round(cap_traslado[t])))
 
-    # --- función objetivo ---
+    # --- función objetivo (Orden de pesos según PDF: ruptura >> puerto-planta >> demurrage >> Suppla cost) ---
     objective_terms = []
     scale = 100
     for c in active_containers:
         objective_terms.append(int(round(params.cost_rupture * scale)) * r_slack[c.id])
+        if params.cost_rupture_event > 0:
+            objective_terms.append(int(round(params.cost_rupture_event * scale)) * late[c.id])
         objective_terms.append(int(round(params.cost_demurrage_day * scale)) * s_slack[c.id])
         objective_terms.append(int(round(params.cost_alert_day * scale)) * a_slack[c.id])
         objective_terms.append(int(round(params.cost_suppla_day * scale)) * suppla_days[c.id])
-
-    cost_capacity_violation = 50.0
-    for slk in sofasa_slacks.values():
-        objective_terms.append(int(round(cost_capacity_violation * scale)) * slk)
-    for slk in suppla_slacks.values():
-        objective_terms.append(int(round(cost_capacity_violation * scale)) * slk)
-    for slk in traslado_slacks.values():
-        objective_terms.append(int(round(cost_capacity_violation * scale)) * slk)
+        if params.cost_suppla_move > 0:
+            objective_terms.append(int(round(params.cost_suppla_move * scale)) * use_suppla[c.id])
 
     model.Minimize(sum(objective_terms))
 
@@ -210,9 +205,20 @@ def optimize_plan(
     status = solver.Solve(model)
 
     status_name = solver.StatusName(status)
+    if status_name != "OPTIMAL":
+        if verbose:
+            print(f"Solver status {status_name}. Reintentando con time_limit_s=60...")
+        solver.parameters.max_time_in_seconds = max(60.0, time_limit_s)
+        status = solver.Solve(model)
+        status_name = solver.StatusName(status)
+
     plan: Plan = {}
+    deferred: List[str] = []
     if status in (cp_model.OPTIMAL, cp_model.FEASIBLE):
         for c in active_containers:
+            if solver.Value(pending[c.id]) == 1:
+                deferred.append(c.id)
+                continue
             em = solver.Value(em_day[c.id])
             if solver.Value(use_suppla[c.id]) == 1:
                 plan[c.id] = PlanEntry(
@@ -224,14 +230,22 @@ def optimize_plan(
             else:
                 plan[c.id] = PlanEntry(container_id=c.id, route="direct", em_day=em)
 
-    kpis = _compute_plan_kpis(active_containers, plan, params)
+    planned = [c for c in active_containers if c.id in plan]
+    kpis = _compute_plan_kpis(planned, plan, params)
+    obj_val = solver.ObjectiveValue() / scale if plan else float("nan")
+    best_bound = solver.BestObjectiveBound() / scale if plan else float("nan")
+    gap = abs(obj_val - best_bound) / (abs(obj_val) + 1e-9) if not math.isnan(obj_val) else 0.0
 
     return OptimizationResult(
         plan=plan,
         status=status_name,
-        objective_value=solver.ObjectiveValue() / scale if plan else float("nan"),
+        objective_value=obj_val,
+        best_objective_bound=best_bound,
+        gap=gap,
         solve_time_s=solver.WallTime(),
         kpis=kpis,
+        out_of_horizon=out_of_horizon,
+        deferred=deferred,
     )
 
 

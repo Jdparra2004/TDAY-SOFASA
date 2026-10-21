@@ -1079,7 +1079,10 @@ def build_dataset(
         return DataBundle(df, tables, _profile(tables, tag_of), notes, None)
 
     base = pd.Timestamp(base_date).normalize() if base_date is not None else df["eta"].min()
-    df["eta_dia"] = (df["eta"] - base).dt.days.clip(lower=0).astype(int)
+    # eta_dia puede ser NEGATIVO: contenedor que ya estaba en puerto antes del día 0 (fecha de
+    # planeación). Antes se recortaba a 0 y se perdían los días reales que llevaba esperando.
+    df["eta_dia"] = (df["eta"] - base).dt.days.astype(int)
+    df["ya_en_puerto"] = df["eta_dia"] < 0
     need = (df["need_by_fecha"] - base).dt.days
     df["ruptura_antes_de_eta"] = need < df["eta_dia"]
     df["need_by_dia"] = np.where(need < df["eta_dia"], df["eta_dia"] + late_fix_days, need).astype(int)
@@ -1213,42 +1216,156 @@ def process_real_tracking_dataframe(
     base_date: Optional[pd.Timestamp] = None,
     **extra: Any,
 ) -> pd.DataFrame:
-    """
-    Igual que en la v1: una fila por contenedor con TODA la información cruzada y las columnas
-    del modelo (id, eta, need_by, part_family->family, vessel...). Cambios:
-      * lee todas las hojas de cada archivo y conserva todas las columnas;
-      * prio_sheets ya no es necesario (por defecto se omiten solas las hojas sin contenedores
-        en común con el Tracking); si se pasa, limita las hojas de Prioridades.
-    Se pueden pasar más archivos con extra_files=[...] para cruzarlos también.
-    """
-    srcs = _legacy_sources(tracking_file, diel_file, prio_file)
-    srcs += _expand_sources(extra.pop("extra_files", []) or [])
-    sheets = {"prioridades": list(prio_sheets)} if prio_sheets else None
-    if sheets and prio_file is not None and not isinstance(prio_file, (str, os.PathLike)):
-        sheets = {_name_of(prio_file, 1): list(prio_sheets)}
-    elif sheets and isinstance(prio_file, (str, os.PathLike)):
-        sheets = {os.path.basename(os.fspath(prio_file)): list(prio_sheets)}
-    bundle = build_dataset(srcs, include_untracked=include_untracked, sheets=sheets,
-                           default_buffer_days=default_buffer_days, late_fix_days=late_fix_days,
-                           base_date=base_date, **extra)
+    base_dt = pd.Timestamp(base_date).normalize() if base_date is not None else pd.Timestamp("2026-10-20")
+    folder_3nd = os.path.abspath("data/3nd Data")
+    
+    # 1. Cargar Tracking.xlsx (Maestra, exactamente 550 IDs)
+    tracking_path = os.path.join(folder_3nd, "Tracking.xlsx")
+    if not os.path.exists(tracking_path):
+        # buscar otro archivo que contenga tracking
+        for fn in os.listdir(folder_3nd):
+            if "tracking" in fn.lower() and fn.endswith(SUPPORTED_EXT):
+                tracking_path = os.path.join(folder_3nd, fn)
+                break
+
+    print(f"[FUENTE DATOS] Archivo maestro: {os.path.abspath(tracking_path)}")
+    xl_track = pd.ExcelFile(tracking_path)
+    sh_track = "Tracking" if "Tracking" in xl_track.sheet_names else xl_track.sheet_names[0]
+    df_track = xl_track.parse(sh_track)
+    print(f"  Hoja: {sh_track} | Filas crudas: {len(df_track)}")
+
+    # Procesar tablas mediante build_dataset pero forzando master
+    srcs = [Source(tracking_path, tag="", master=True)]
+    diel_path = os.path.join(folder_3nd, "Programacion DIEL.xlsx")
+    if not os.path.exists(diel_path):
+        for fn in os.listdir(folder_3nd):
+            if ("diel" in fn.lower() or "programacion" in fn.lower()) and fn.endswith(SUPPORTED_EXT):
+                diel_path = os.path.join(folder_3nd, fn)
+                break
+    if os.path.exists(diel_path):
+        print(f"[FUENTE DATOS] Archivo apoyo DIEL: {os.path.abspath(diel_path)}")
+        xl_diel = pd.ExcelFile(diel_path)
+        diel_rows = sum(len(xl_diel.parse(sh)) for sh in xl_diel.sheet_names)
+        print(f"  Hojas: {xl_diel.sheet_names} | Filas crudas: {diel_rows}")
+        srcs.append(Source(diel_path, tag="diel"))
+
+    prio_path = os.path.join(folder_3nd, "Prioridades CKD.xlsx")
+    if not os.path.exists(prio_path):
+        for fn in os.listdir(folder_3nd):
+            if "prioridades" in fn.lower() and fn.endswith(SUPPORTED_EXT):
+                prio_path = os.path.join(folder_3nd, fn)
+                break
+    if os.path.exists(prio_path):
+        print(f"[FUENTE DATOS] Archivo apoyo Prioridades: {os.path.abspath(prio_path)}")
+        xl_prio = pd.ExcelFile(prio_path)
+        prio_rows = sum(len(xl_prio.parse(sh)) for sh in xl_prio.sheet_names)
+        print(f"  Hojas: {xl_prio.sheet_names} | Filas crudas: {prio_rows}")
+        srcs.append(Source(prio_path, tag="prio"))
+
+    bundle = build_dataset(srcs, include_untracked=False, base_date=base_dt, default_buffer_days=default_buffer_days, late_fix_days=late_fix_days)
     df = bundle.master
-    if df.empty:
-        return df
+
+    # Recopilar IDs de apoyo que NO están en Tracking para la hoja "No están en Tracking"
+    tracking_ids = set(bundle.table(sh_track, file=os.path.basename(tracking_path))["id"].dropna() if bundle.table(sh_track, file=os.path.basename(tracking_path)) is not None else df["id"].dropna())
+    
+    no_tracking_records = []
+    for t in bundle.tables:
+        if t.file != os.path.basename(tracking_path) and t.has_id:
+            for cid in t.ids:
+                if cid and pd.notna(cid) and cid not in tracking_ids:
+                    no_tracking_records.append({"id": cid, "fuente": f"{t.file} / {t.label}"})
+    no_tracking_df = pd.DataFrame(no_tracking_records).drop_duplicates(subset=["id"]) if no_tracking_records else pd.DataFrame(columns=["id", "fuente"])
+    df.attrs["no_tracking_df"] = no_tracking_df
+    print(f"Contenedores no en Tracking (fuera del modelo): {len(no_tracking_df)}")
+
     attrs = dict(df.attrs)
     df = _legacy_aliases(df)
     df.attrs.update(attrs)
     return df
 
 
-def process_real_tracking_data(tracking_file=None, diel_file=None, prio_file=None, **kwargs) -> List[Container]:
-    """Igual que la v1: lista de Container (id, eta, need_by, part_family, vessel) para el modelo."""
-    df = process_real_tracking_dataframe(tracking_file, diel_file, prio_file, **kwargs)
-    containers: List[Container] = [
-        Container(id=str(r.id), eta=int(r.eta_dia), need_by=int(r.need_by_dia),
-                  part_family=str(r.family), vessel=str(r.vessel))
-        for r in df.itertuples(index=False)
-    ] if not df.empty else []
-    logger.info("Procesamiento finalizado. Total contenedores cargados: %d", len(containers))
+def process_real_tracking_data(tracking_file=None, diel_file=None, prio_file=None, base_date: Optional[pd.Timestamp] = None, **kwargs) -> List[Container]:
+    """Procesa y filtra contenedores excluyendo los que ya tienen EM real previa al día 0."""
+    base_dt = pd.Timestamp(base_date).normalize() if base_date is not None else pd.Timestamp("2026-10-20")
+
+    df = process_real_tracking_dataframe(tracking_file, diel_file, prio_file, base_date=base_dt, **kwargs)
+    if df.empty:
+        return []
+
+    unique_tracking_count = df["id"].dropna().nunique()
+    if unique_tracking_count != 550:
+        raise ValueError(f"Validacion fallida: Tracking de @data/3nd/ debe tener exactamente 550 contenedores únicos (tiene {unique_tracking_count})")
+
+    prior_em_cols = [c for c in ["em_diel", "diel_em_diel", "fecha_em_prog", "prio_em_prog", "fecha_em_plan"] if c in df.columns]
+    is_already_in_plant = pd.Series(False, index=df.index)
+    for col in prior_em_cols:
+        dt_s = pd.to_datetime(df[col], errors="coerce")
+        is_already_in_plant |= (dt_s.notna() & (dt_s < base_dt) & (dt_s.dt.year >= 2020))
+
+    excluded_df = df[is_already_in_plant].copy()
+    active_df = df[~is_already_in_plant].copy()
+    df.attrs["excluded_in_plant_df"] = excluded_df
+    df.attrs["excluded_count"] = len(excluded_df)
+    print(f"Contenedores excluidos (ya en planta antes del día 0): {len(excluded_df)}")
+
+    containers: List[Container] = []
+    for r in active_df.itertuples(index=False):
+        c_id = str(getattr(r, "id", ""))
+        eta = int(getattr(r, "eta_dia", 0))
+        need_by = int(getattr(r, "need_by_dia", eta + 10))
+        fam = str(getattr(r, "family", getattr(r, "part_family", "N/D")))
+        if fam in ("nan", "", "<NA>"):
+            fam = "N/D"
+        vessel = str(getattr(r, "vessel", "N/D"))
+        if vessel in ("nan", "", "<NA>"):
+            vessel = "N/D"
+        orig = str(getattr(r, "prio_origen", getattr(r, "origen", "N/D")))
+        if orig in ("nan", "", "<NA>", "GEN"):
+            orig = "N/D"
+
+        em_prev = None
+        for col in ["diel_em_diel", "fecha_em_prog", "prio_em_prog", "em_diel", "fecha_em_plan"]:
+            val = getattr(r, col, None) if hasattr(r, col) else None
+            if pd.notna(val):
+                dt_val = pd.to_datetime(val, errors="coerce")
+                if pd.notna(dt_val) and dt_val.year >= 2020:
+                    em_prev = (dt_val.normalize() - base_dt).days
+                    break
+
+        need_dt = base_dt + pd.Timedelta(days=need_by)
+        curr = need_dt
+        biz_sub = 0
+        while biz_sub < 2:
+            curr -= pd.Timedelta(days=1)
+            if curr.weekday() < 5:
+                biz_sub += 1
+        em_obj = (curr - base_dt).days
+        is_est = bool(getattr(r, "ruptura_estimada", False))
+        if is_est:
+            em_obj = eta + 10
+
+        etd_val = getattr(r, "etd", getattr(r, "etd_real", getattr(r, "etd_inicial", None)))
+        etd_dia = None
+        if pd.notna(etd_val):
+            dt_e = pd.to_datetime(etd_val, errors="coerce")
+            if pd.notna(dt_e) and dt_e.year >= 2020:
+                etd_dia = (dt_e.normalize() - base_dt).days
+
+        containers.append(
+            Container(
+                id=c_id,
+                eta=eta,
+                need_by=need_by,
+                part_family=fam,
+                vessel=vessel,
+                em_objetivo=em_obj,
+                em_previa=em_prev,
+                origen=orig,
+                etd=etd_dia,
+                need_by_estimado=is_est,
+            )
+        )
+    logger.info("Procesamiento finalizado. Total contenedores activos: %d (Excluidos ya en planta: %d)", len(containers), len(excluded_df))
     return containers
 
 
