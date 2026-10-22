@@ -788,7 +788,8 @@ class DataBundle:
         df = self.master
         if df.empty:
             return []
-        return [Container(id=str(r.id), eta=int(r.eta_dia), need_by=int(r.need_by_dia),
+        return [Container(id=str(r.id), eta=int(r.eta_dia),
+                          need_by=None if pd.isna(r.need_by_dia) else int(r.need_by_dia),
                           part_family=str(r.family), vessel=str(r.vessel))
                 for r in df.itertuples(index=False)]
 
@@ -913,8 +914,6 @@ def build_dataset(
     include_untracked: bool = False,
     skip_disjoint: bool = True,
     exclude_status: Sequence[str] = ("DESCARGADO",),
-    default_buffer_days: int = 10,
-    late_fix_days: int = 7,
     base_date: Optional[pd.Timestamp] = None,
 ) -> DataBundle:
     """
@@ -927,9 +926,7 @@ def build_dataset(
     include_untracked  agrega contenedores que están en archivos de apoyo (con ETA, no descargados)
                        pero no en la maestra.
     skip_disjoint      omite tablas sin ningún contenedor en común con la maestra (históricos).
-    default_buffer_days need_by = ETA + este valor cuando no hay fecha de ruptura.
-    late_fix_days      si la ruptura es anterior a la ETA, need_by = eta + este valor
-                       (la ruptura original queda en 'ruptura'; bandera 'ruptura_antes_de_eta').
+    (sin fecha real de ruptura NO se inventa una: need_by_dia queda <NA>; bandera 'ruptura_antes_de_eta' si la ruptura es anterior a la ETA)
     """
     srcs = _expand_sources(sources)
     tables, problems = _load(srcs)
@@ -1068,8 +1065,8 @@ def build_dataset(
         _set_canonical(df, "etd", pd.to_datetime(etd))
     rup = df[[c for c in rup_cols if c != "ruptura"]].min(axis=1) if rup_cols else pd.Series(pd.NaT, index=df.index)
     _set_canonical(df, "ruptura", pd.to_datetime(rup))
-    df["need_by_fecha"] = df["ruptura"].fillna(df["eta"] + pd.Timedelta(days=default_buffer_days))
-    df["ruptura_estimada"] = df["ruptura"].isna()
+    df["need_by_fecha"] = df["ruptura"]            # sin fecha real no se inventa ruptura (queda NaT)
+    df["ruptura_estimada"] = df["ruptura"].isna()  # True = "Sin ruptura" (sin fecha real)
 
     n_before = len(df)
     df = df[df["eta"].notna()].copy()
@@ -1084,8 +1081,8 @@ def build_dataset(
     df["eta_dia"] = (df["eta"] - base).dt.days.astype(int)
     df["ya_en_puerto"] = df["eta_dia"] < 0
     need = (df["need_by_fecha"] - base).dt.days
-    df["ruptura_antes_de_eta"] = need < df["eta_dia"]
-    df["need_by_dia"] = np.where(need < df["eta_dia"], df["eta_dia"] + late_fix_days, need).astype(int)
+    df["ruptura_antes_de_eta"] = (need < df["eta_dia"]).fillna(False)
+    df["need_by_dia"] = need.astype("Int64")       # <NA> = sin ruptura real
 
     lead = ["id", "eta_dia", "need_by_dia", "family", "vessel", "eta", "ruptura", "need_by_fecha",
             "ruptura_estimada", "ruptura_antes_de_eta", "fuente"]
@@ -1211,30 +1208,19 @@ def process_real_tracking_dataframe(
     prio_file: Optional[FileSource] = None,
     prio_sheets: Optional[Sequence[str]] = None,
     include_untracked: bool = False,
-    default_buffer_days: int = 10,
-    late_fix_days: int = 7,
     base_date: Optional[pd.Timestamp] = None,
     **extra: Any,
 ) -> pd.DataFrame:
     base_dt = pd.Timestamp(base_date).normalize() if base_date is not None else pd.Timestamp("2026-10-20")
     
     if tracking_file is None and diel_file is None and prio_file is None:
-        if os.path.exists("data/3nd Data"):
-            tracking_file = os.path.abspath("data/3nd Data")
-        elif os.path.exists("data"):
-            tracking_file = os.path.abspath("data")
-        else:
-            raise ValueError("El Tracking es obligatorio: define el universo o sube un archivo.")
+        raise ValueError("El Tracking es obligatorio: define el universo o sube un archivo.")
 
     srcs = _legacy_sources(tracking_file, diel_file, prio_file)
     if not srcs:
-        if os.path.exists("data/3nd Data"):
-            tracking_file = os.path.abspath("data/3nd Data")
-            srcs = _legacy_sources(tracking_file, diel_file, prio_file)
-        else:
-            raise ValueError("El Tracking es obligatorio: no se encontraron fuentes de datos válidas.")
+        raise ValueError("El Tracking es obligatorio: no se encontraron fuentes de datos válidas.")
 
-    bundle = build_dataset(srcs, include_untracked=include_untracked, base_date=base_dt, default_buffer_days=default_buffer_days, late_fix_days=late_fix_days)
+    bundle = build_dataset(srcs, include_untracked=include_untracked, base_date=base_dt)
     df = bundle.master
 
     master_table = None
@@ -1255,7 +1241,7 @@ def process_real_tracking_dataframe(
                     no_tracking_records.append({"id": cid, "fuente": f"{t.file} / {t.label}"})
     no_tracking_df = pd.DataFrame(no_tracking_records).drop_duplicates(subset=["id"]) if no_tracking_records else pd.DataFrame(columns=["id", "fuente"])
     df.attrs["no_tracking_df"] = no_tracking_df
-    print(f"Contenedores no en Tracking (fuera del modelo): {len(no_tracking_df)}")
+    df.attrs["tracking_ids"] = set(tracking_ids)
 
     attrs = dict(df.attrs)
     df = _legacy_aliases(df)
@@ -1263,92 +1249,189 @@ def process_real_tracking_dataframe(
     return df
 
 
-def process_real_tracking_data(tracking_file=None, diel_file=None, prio_file=None, base_date: Optional[pd.Timestamp] = None, **kwargs) -> List[Container]:
-    """Procesa y filtra contenedores excluyendo los que ya tienen EM real previa al día 0."""
-    base_dt = pd.Timestamp(base_date).normalize() if base_date is not None else pd.Timestamp("2026-10-20")
+def _to_day(series: pd.Series, base_dt: pd.Timestamp) -> pd.Series:
+    """Fechas -> día relativo al día 0 (Int64 con <NA> donde no hay fecha válida)."""
+    dt = pd.to_datetime(series, errors="coerce")
+    dt = dt.where(dt.dt.year >= 2020)
+    return ((dt.dt.normalize() - base_dt).dt.days).astype("Int64")
 
-    df = process_real_tracking_dataframe(tracking_file, diel_file, prio_file, base_date=base_dt, **kwargs)
-    if df.empty:
-        return []
 
-    unique_tracking_count = df["id"].dropna().nunique()
-    is_default_3nd = (tracking_file is None and diel_file is None and prio_file is None) or \
-                     (isinstance(tracking_file, (str, os.PathLike)) and "3nd Data" in str(tracking_file))
-    if is_default_3nd and unique_tracking_count != 550:
-        print(f"Advertencia: El Tracking detectado tiene {unique_tracking_count} contenedores únicos (esperado 550 en 3nd Data).")
+def _business_days_before(day: int, n: int, base_dt: pd.Timestamp) -> int:
+    """Día relativo resultante de restar n días hábiles (lunes-viernes) a `day`."""
+    curr = base_dt + pd.Timedelta(days=int(day))
+    done = 0
+    while done < n:
+        curr -= pd.Timedelta(days=1)
+        if curr.weekday() < 5:
+            done += 1
+    return int((curr - base_dt).days)
 
-    prior_em_cols = [c for c in ["em", "em_diel", "diel_em_diel", "fecha_em_prog", "prio_em_prog", "fecha_em_plan"] if c in df.columns]
-    is_already_in_plant = pd.Series(False, index=df.index)
-    for col in prior_em_cols:
-        dt_s = pd.to_datetime(df[col], errors="coerce")
-        is_already_in_plant |= (dt_s.notna() & (dt_s < base_dt) & (dt_s.dt.year >= 2020))
 
-    excluded_df = df[is_already_in_plant].copy()
-    active_df = df[~is_already_in_plant].copy()
-    df.attrs["excluded_in_plant_df"] = excluded_df
-    df.attrs["excluded_count"] = len(excluded_df)
-    print(f"Contenedores excluidos (ya en planta antes del día 0): {len(excluded_df)}")
+def _add_day_columns(df: pd.DataFrame, params: Params, base_dt: pd.Timestamp) -> pd.DataFrame:
+    """Agrega columnas en días relativos al día 0: ruptura_dia, em_objetivo_dia, em_previa_dia, etd_dia.
+    ruptura_dia es <NA> cuando no hay fecha real de ruptura (Prioridades/DIEL); nunca se inventa."""
+    df = df.copy()
+    n = len(df)
+    nat = pd.Series(pd.NaT, index=df.index)
+    df["ruptura_dia"] = _to_day(df["ruptura"] if "ruptura" in df.columns else nat, base_dt)
+    df["etd_dia"] = _to_day(df["etd"] if "etd" in df.columns else nat, base_dt)
+    prev = pd.Series(pd.NaT, index=df.index, dtype="datetime64[ns]")
+    for col in ("fecha_em_prog", "em_diel", "diel_em_diel", "prio_em_prog"):
+        if col in df.columns:
+            prev = prev.fillna(pd.to_datetime(df[col], errors="coerce").where(lambda s: s.dt.year >= 2020))
+    df["em_previa_dia"] = _to_day(prev, base_dt)
+    eta = pd.to_numeric(df["eta_dia"], errors="coerce")
+    objetivo = []
+    for e, r in zip(eta, df["ruptura_dia"]):
+        if pd.isna(e):
+            objetivo.append(pd.NA)
+        elif pd.isna(r):
+            objetivo.append(int(e) + params.l_obj)                       # sin ruptura real: ETA + l_obj
+        else:
+            objetivo.append(_business_days_before(int(r), params.dias_habiles_resta, base_dt))
+    df["em_objetivo_dia"] = pd.array(objetivo, dtype="Int64") if n else pd.array([], dtype="Int64")
+    return df
+
+
+def classify_universe(df: pd.DataFrame, params: Params, base_date: pd.Timestamp) -> pd.DataFrame:
+    """Clasifica cada fila (sin borrar ninguna) y agrega `estado_universo` y `motivo_estado`.
+    - EXCLUIDO_EN_PLANTA: EM REAL (columna `em`) anterior al día 0. Nunca fecha_em_plan/fecha_em_prog/DIEL (son EM previa).
+    - FUERA_VENTANA: no excluido y ETA posterior al horizonte (eta_dia > horizon - 1).
+    - PROGRAMABLE: el resto (el solver decide en horizonte / EM proyectada / diferido).
+    """
+    base_dt = pd.Timestamp(base_date).normalize()
+    df = _add_day_columns(df, params, base_dt)
+    em_real = pd.to_datetime(df["em"], errors="coerce") if "em" in df.columns else pd.Series(pd.NaT, index=df.index)
+    em_real = em_real.where(em_real.dt.year >= 2020).dt.normalize()
+    eta = pd.to_numeric(df["eta_dia"], errors="coerce")
+    excl = em_real.notna() & (em_real < base_dt)
+    fuera = ~excl & (eta > params.horizon - 1)
+    estado = np.where(excl, "EXCLUIDO_EN_PLANTA", np.where(fuera, "FUERA_VENTANA", "PROGRAMABLE"))
+    motivo = np.where(
+        excl, "EM real " + em_real.dt.strftime("%Y-%m-%d").fillna("") + " anterior al día 0 (" + base_dt.strftime("%Y-%m-%d") + ")",
+        np.where(fuera, "ETA día " + eta.astype("Int64").astype(str) + " posterior al horizonte: se programa en la siguiente planeación",
+                 "Programable dentro de la ventana"))
+    df["estado_universo"] = estado
+    df["motivo_estado"] = motivo
+    return df
+
+
+def finalize_universe(df: pd.DataFrame, tracking_ids: set, base_dt: pd.Timestamp,
+                      no_tracking_df: Optional[pd.DataFrame] = None) -> Tuple[List[Container], pd.DataFrame]:
+    """Embudo, attrs y objetos Container de los programables. Compartido por la ruta de archivos y la manual."""
+    assert set(df["id"].dropna()).issubset(set(tracking_ids)), "IDs del universo deben existir en el Tracking"
+    assert df["id"].is_unique, "IDs duplicados en el universo"
+    exc = df[df["estado_universo"] == "EXCLUIDO_EN_PLANTA"].copy()
+    fue = df[df["estado_universo"] == "FUERA_VENTANA"].copy()
+    pro = df[df["estado_universo"] == "PROGRAMABLE"].copy()
+    nt = no_tracking_df if no_tracking_df is not None else pd.DataFrame(columns=["id", "fuente"])
+    embudo = {
+        "tracking_total": len(df), "excluidos": len(exc), "fuera_ventana": len(fue), "programables": len(pro),
+        "programables_con_ruptura_real": int(pro["ruptura_dia"].notna().sum()),
+        "programables_sin_ruptura": int(pro["ruptura_dia"].isna().sum()),
+        "no_tracking": len(nt),
+    }
+    assert embudo["excluidos"] + embudo["fuera_ventana"] + embudo["programables"] == embudo["tracking_total"], \
+        "La suma del embudo no coincide con el total del Tracking"
+    df.attrs.update({"excluded_df": exc, "fuera_ventana_df": fue, "no_tracking_df": nt, "embudo": embudo,
+                     "base_date": base_dt})
+
+    def _ok(v):
+        return pd.notna(v) and str(v).strip() not in ("", "nan", "<NA>", "GEN", "N/D", "BUQUE_GEN")
+
+    def _int(v):
+        return None if pd.isna(v) else int(v)
 
     containers: List[Container] = []
-    def _ok(v): return pd.notna(v) and str(v).strip() not in ("", "nan", "<NA>", "GEN", "N/D")
+    for r in pro.to_dict("records"):
+        rup = _int(r.get("ruptura_dia"))
+        orig = next((str(r[k]) for k in ("sourcing", "origen", "prio_origen") if k in r and _ok(r[k])), "N/D")
+        fam = str(r.get("family", "N/D")) if _ok(r.get("family")) else "N/D"
+        ves = str(r.get("vessel", "N/D")) if _ok(r.get("vessel")) else "N/D"
+        containers.append(Container(
+            id=str(r["id"]), eta=int(r["eta_dia"]), need_by=rup, part_family=fam, vessel=ves,
+            em_objetivo=_int(r.get("em_objetivo_dia")), em_previa=_int(r.get("em_previa_dia")),
+            ruptura_real=rup, need_by_estimado=rup is None, origen=orig, etd=_int(r.get("etd_dia")),
+        ))
+    return containers, df
 
-    for r in active_df.itertuples(index=False):
-        c_id = str(getattr(r, "id", ""))
-        eta = int(getattr(r, "eta_dia", 0))
-        need_by = int(getattr(r, "need_by_dia", eta + 10))
-        fam = str(getattr(r, "family", getattr(r, "part_family", "N/D")))
-        if fam in ("nan", "", "<NA>"):
-            fam = "N/D"
-        vessel = str(getattr(r, "vessel", "N/D"))
-        if vessel in ("nan", "", "<NA>"):
-            vessel = "N/D"
-        
-        orig = next((str(v) for v in (getattr(r, "sourcing", None), getattr(r, "origen", None), getattr(r, "prio_origen", None)) if _ok(v)), "N/D")
 
-        em_prev = None
-        for col in ["em", "diel_em_diel", "fecha_em_prog", "prio_em_prog", "em_diel", "fecha_em_plan"]:
-            val = getattr(r, col, None) if hasattr(r, col) else None
-            if pd.notna(val):
-                dt_val = pd.to_datetime(val, errors="coerce")
-                if pd.notna(dt_val) and dt_val.year >= 2020:
-                    em_prev = (dt_val.normalize() - base_dt).days
-                    break
+def process_real_tracking_data(
+    tracking_file: Optional[FileSource] = None,
+    diel_file: Optional[FileSource] = None,
+    prio_file: Optional[FileSource] = None,
+    base_date: Optional[pd.Timestamp] = None,
+    params: Optional[Params] = None,
+    **kwargs: Any,
+) -> Tuple[List[Container], pd.DataFrame]:
+    """Procesa los archivos, clasifica el universo y devuelve (containers_programables, df_universo).
+    df.attrs: excluded_df, fuera_ventana_df, no_tracking_df, embudo, tracking_ids."""
+    base_dt = pd.Timestamp(base_date).normalize() if base_date is not None else pd.Timestamp("2026-10-20")
+    p = params if params is not None else Params()
+    df = process_real_tracking_dataframe(tracking_file, diel_file, prio_file, base_date=base_dt, **kwargs)
+    if df.empty:
+        e = pd.DataFrame(columns=["id", "estado_universo", "motivo_estado"])
+        e.attrs["embudo"] = {"tracking_total": 0, "excluidos": 0, "fuera_ventana": 0, "programables": 0}
+        return [], e
+    tracking_ids = df.attrs.get("tracking_ids", set(df["id"].dropna()))
+    no_tracking = df.attrs.get("no_tracking_df")
+    df = classify_universe(df, p, base_dt)
+    return finalize_universe(df, tracking_ids, base_dt, no_tracking)
 
-        need_dt = base_dt + pd.Timedelta(days=need_by)
-        curr = need_dt
-        biz_sub = 0
-        while biz_sub < 2:
-            curr -= pd.Timedelta(days=1)
-            if curr.weekday() < 5:
-                biz_sub += 1
-        em_obj = (curr - base_dt).days
-        is_est = bool(getattr(r, "ruptura_estimada", False))
-        if is_est:
-            em_obj = eta + 10
 
-        etd_val = getattr(r, "etd", getattr(r, "etd_real", getattr(r, "etd_inicial", None)))
-        etd_dia = None
-        if pd.notna(etd_val):
-            dt_e = pd.to_datetime(etd_val, errors="coerce")
-            if pd.notna(dt_e) and dt_e.year >= 2020:
-                etd_dia = (dt_e.normalize() - base_dt).days
+def _fmt_date(v: Any, base_dt: pd.Timestamp, offset: bool = False) -> str:
+    """AAAA-MM-DD; 'N/D' si no hay dato. offset=True interpreta números como días desde el día 0."""
+    if v is None or (not isinstance(v, (str, pd.Timestamp, datetime, date)) and pd.isna(v)):
+        return "N/D"
+    if isinstance(v, str) and v.strip() in ("", "nan", "NaT", "<NA>", "None", "N/D"):
+        return "N/D"
+    if offset and not isinstance(v, (str, pd.Timestamp, datetime, date)):
+        return (base_dt + pd.Timedelta(days=int(v))).strftime("%Y-%m-%d")
+    dt = pd.to_datetime(v, errors="coerce")
+    return "N/D" if pd.isna(dt) else pd.Timestamp(dt).strftime("%Y-%m-%d")
 
-        containers.append(
-            Container(
-                id=c_id,
-                eta=eta,
-                need_by=need_by,
-                part_family=fam,
-                vessel=vessel,
-                em_objetivo=em_obj,
-                em_previa=em_prev,
-                origen=orig,
-                etd=etd_dia,
-                need_by_estimado=is_est,
-            )
-        )
-    logger.info("Procesamiento finalizado. Total contenedores activos: %d (Excluidos ya en planta: %d)", len(containers), len(excluded_df))
-    return containers
+
+def _txt(v: Any) -> str:
+    return "N/D" if v is None or pd.isna(v) or str(v).strip() in ("", "nan", "<NA>", "GEN", "BUQUE_GEN") else str(v)
+
+
+def to_display_df(containers_o_df: Union[Sequence[Container], pd.DataFrame],
+                  base_date: Optional[Union[str, pd.Timestamp, date]] = None) -> pd.DataFrame:
+    """Listado legible: ID, Buque, Origen, ETD, ETA, Ruptura, Tipo ruptura (Real / Sin ruptura), EM objetivo,
+    EM previa, Estado del universo. Fechas AAAA-MM-DD y 'N/D' si falta el dato (nunca None/NaT/número de día)."""
+    if base_date is None and isinstance(containers_o_df, pd.DataFrame):
+        base_date = containers_o_df.attrs.get("base_date")
+    base_dt = pd.Timestamp(base_date).normalize() if base_date is not None else pd.Timestamp("2026-10-20")
+    rows = []
+    if isinstance(containers_o_df, pd.DataFrame):
+        df = containers_o_df
+        if "ruptura_dia" not in df.columns:
+            df = _add_day_columns(df, Params(), base_dt)
+        for r in df.to_dict("records"):
+            orig = next((r[k] for k in ("sourcing", "origen", "prio_origen") if k in r and _txt(r[k]) != "N/D"), None)
+            has_rup = pd.notna(r.get("ruptura_dia"))
+            rows.append({
+                "ID": _txt(r.get("id")), "Buque": _txt(r.get("vessel")), "Origen": _txt(orig),
+                "ETD": _fmt_date(r.get("etd"), base_dt), "ETA": _fmt_date(r.get("eta"), base_dt),
+                "Ruptura": _fmt_date(r.get("ruptura_dia"), base_dt, True) if has_rup else "N/D",
+                "Tipo ruptura": "Real" if has_rup else "Sin ruptura",
+                "EM objetivo": _fmt_date(r.get("em_objetivo_dia"), base_dt, True),
+                "EM previa": _fmt_date(r.get("em_previa_dia"), base_dt, True),
+                "Estado del universo": _txt(r.get("estado_universo", "PROGRAMABLE")),
+            })
+    else:
+        for c in containers_o_df:
+            rows.append({
+                "ID": _txt(c.id), "Buque": _txt(c.vessel), "Origen": _txt(c.origen),
+                "ETD": _fmt_date(c.etd, base_dt, True), "ETA": _fmt_date(c.eta, base_dt, True),
+                "Ruptura": _fmt_date(c.ruptura_real, base_dt, True),
+                "Tipo ruptura": "Real" if c.ruptura_real is not None else "Sin ruptura",
+                "EM objetivo": _fmt_date(c.em_objetivo, base_dt, True),
+                "EM previa": _fmt_date(c.em_previa, base_dt, True),
+                "Estado del universo": c.estado.value if c.estado is not None else "PROGRAMABLE",
+            })
+    cols = ["ID", "Buque", "Origen", "ETD", "ETA", "Ruptura", "Tipo ruptura", "EM objetivo", "EM previa", "Estado del universo"]
+    return pd.DataFrame(rows, columns=cols).fillna("N/D")
 
 
 # =============================================================================

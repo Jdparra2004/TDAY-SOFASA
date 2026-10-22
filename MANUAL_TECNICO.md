@@ -59,9 +59,9 @@ pip install -r requirements.txt
 ## 4. Parametros Operativos Simplificados y Fechas Calendario
 
 La aplicacion ha sido optimizada para reflejar la operacion real del planificador:
-1. **Fechas Calendario:** Todas las fechas mostradas en tablas, KPIs, inspectores y recomendaciones operativas se presentan en formato de fecha calendario (`YYYY-MM-DD`), tomando como dia base la fecha de ejecucion actual (hoy), facilitando la programacion a 30 o mas dias. Internamente, el sistema procesa los calculos en dias numéricos para el solver.
-2. **Capacidades Operativas Reales:** Se han omitido los campos abstractos de inventario inicial, capacidad en uso y tasa de consumo diario. El operador unicamente configura:
-   - **Bodega Suppla (Rionegro):** Capacidad semanal de recepcion y capacidad diaria de traslado hacia planta, seleccionando los dias de la semana habilitados.
+1. **Fechas Calendario:** Todas las fechas mostradas en tablas, KPIs, inspectores y recomendaciones operativas se presentan en formato de fecha calendario (`YYYY-MM-DD`), tomando como dia base la fecha de ejecucion actual o seleccionada, facilitando la programacion a 20 o mas dias. Internamente, el sistema procesa los calculos en dias numéricos para el solver.
+2. **Capacidades Operativas Reales:** El operador configura:
+   - **Bodega Suppla (Rionegro):** Capacidad semanal de recepcion, capacidad diaria de traslado hacia planta, y seleccion de los dias de la semana habilitados para traslados.
    - **Fabrica SOFASA:** Capacidad maxima de recepcion diaria de contenedores en planta.
 
 ---
@@ -71,7 +71,7 @@ La aplicacion ha sido optimizada para reflejar la operacion real del planificado
 Para verificar que el pipeline de datos, simulacion y optimizacion funciona correctamente frente a los datos reales:
 
 ```bash
-python tests/test_regresion.py
+python -m pytest tests/test_pipeline.py
 ```
 
 El script validara de forma automatizada:
@@ -99,4 +99,5 @@ Para levantar la aplicacion web interactiva localmente:
 streamlit run app.py
 ```
 
-La aplicacion abrira automaticamente en su navegador web predeterminado (por defecto en `http://localhost:8501`), permitiendo cargar archivos de Excel, configurar capacidades de Suppla y Sofasa, visualizar fechas calendario y exportar el plan prescriptivo en CSV.
+La aplicacion abrira automaticamente en su navegador web predeterminado (por defecto en `http://localhost:8501`), permitiendo cargar archivos de Excel, configurar capacidades de Suppla y Sofasa, visualizar fechas calendario y exportar el plan prescriptivo en CSV y Excel.
+

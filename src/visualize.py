@@ -39,12 +39,14 @@ plt.rcParams.update(
 )
 
 
-def plot_inventory_over_time(daily_df: pd.DataFrame, title: str) -> Any:
-    fig, ax = plt.subplots(figsize=(9, 4))
-    ax.plot(daily_df["day"], daily_df["inv_sofasa"], color=COLOR_SOFASA, linewidth=2, label="Inventario SOFASA")
-    ax.plot(daily_df["day"], daily_df["inv_suppla"], color=COLOR_SUPPLA, linewidth=2, label="Inventario Suppla")
+def plot_suppla_occupancy(daily_baseline: pd.DataFrame, daily_opt: pd.DataFrame,
+                          title: str = "Ocupación de Suppla: línea base vs. plan optimizado") -> Any:
+    """Contenedores almacenados en Suppla por día (no hay inventario SOFASA en el modelo)."""
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.plot(daily_baseline["day"], daily_baseline["ocupacion_suppla"], color=COLOR_BASELINE, linewidth=2, label="Línea base")
+    ax.plot(daily_opt["day"], daily_opt["ocupacion_suppla"], color=COLOR_OPTIMIZADO, linewidth=2, label="Plan optimizado")
     ax.set_xlabel("Día del horizonte")
-    ax.set_ylabel("Contenedores en bodega")
+    ax.set_ylabel("Contenedores en Suppla")
     ax.set_title(title)
     ax.legend(frameon=False)
     ax.set_ylim(bottom=0)
@@ -52,30 +54,25 @@ def plot_inventory_over_time(daily_df: pd.DataFrame, title: str) -> Any:
     return fig
 
 
-def plot_inventory_comparison(
-    daily_baseline: pd.DataFrame, daily_opt: pd.DataFrame, warehouse: str, title: str
-) -> Any:
-    """warehouse: 'inv_sofasa' o 'inv_suppla'"""
-    fig, ax = plt.subplots(figsize=(10, 5))
-    
-    # Asegurar que el eje X cubra el horizonte completo
-    max_day = max(daily_baseline["day"].max(), daily_opt["day"].max())
-    
-    ax.plot(daily_baseline["day"], daily_baseline[warehouse], color=COLOR_BASELINE, linewidth=2, label="Línea base (heurística)")
-    ax.plot(daily_opt["day"], daily_opt[warehouse], color=COLOR_OPTIMIZADO, linewidth=2, label="Plan optimizado")
-    
-    ax.set_xlabel("Día del horizonte")
-    ax.set_ylabel("Contenedores en bodega")
+def plot_cost_comparison(costos_base, costos_opt, title: str = "Costo en USD: línea base vs. plan optimizado") -> Any:
+    """Costo por componente (demurrage, traslados Suppla→SOFASA, total) de ambos planes."""
+    comps = [("Demurrage", "usd_demurrage"), ("Traslados Suppla", "usd_traslado"), ("Total", "usd_total")]
+    fig, ax = plt.subplots(figsize=(8, 4.6))
+    x = range(len(comps))
+    w = 0.35
+    bv = [costos_base.totals[k] for _, k in comps]
+    ov = [costos_opt.totals[k] for _, k in comps]
+    ax.bar([i - w / 2 for i in x], bv, w, color=COLOR_BASELINE, label="Línea base")
+    ax.bar([i + w / 2 for i in x], ov, w, color=COLOR_OPTIMIZADO, label="Plan optimizado")
+    for i, (a_, b_) in enumerate(zip(bv, ov)):
+        ax.text(i - w / 2, a_, f"{a_:,.0f}", ha="center", va="bottom", fontsize=8)
+        ax.text(i + w / 2, b_, f"{b_:,.0f}", ha="center", va="bottom", fontsize=8)
+    ax.set_xticks(list(x))
+    ax.set_xticklabels([n for n, _ in comps])
+    ax.set_ylabel("USD")
     ax.set_title(title)
-    ax.legend(frameon=True, loc='best')
-    
-    # Ajustar escalas y límites
-    ax.set_xlim(0, max_day)
-    ax.set_ylim(bottom=0)
-    
-    # Añadir grid mejorado
-    ax.grid(True, which='both', linestyle='--', linewidth=0.5)
-    
+    ax.margins(y=0.15)
+    ax.legend(frameon=False)
     fig.tight_layout()
     return fig
 
