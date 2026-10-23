@@ -95,7 +95,12 @@ class Params:
     l_max: int = 12  # regla del PDF / supuesto: máximo puerto->planta antes de demurrage
     dias_habiles_resta: int = 2  # regla del PDF / supuesto: días hábiles hábiles de holgura para EM objetivo
     USD_DEMURRAGE_DIA: float = 80.0  # regla del PDF / supuesto: costo diario demurrage por contenedor
-    USD_TRASLADO_SUPPLA: float = 80.0  # regla del PDF / supuesto: costo fijo por traslado Suppla
+    USD_SUPPLA_MES_40FT: float = 1049.17  # Costo de almacenamiento en Suppla por contenedor de 40 pies (~65 m3) por mes (30 días)
+    DIAS_MES_SUPPLA: int = 30
+
+    @property
+    def USD_SUPPLA_DIA(self) -> float:
+        return self.USD_SUPPLA_MES_40FT / float(self.DIAS_MES_SUPPLA)
 
     @property
     def horizon_solver(self) -> int:
@@ -104,12 +109,11 @@ class Params:
     # --- Suppla reglas y permanencia ---
     min_suppla_stay_days: int = 1  # permanencia mínima en Suppla antes de traslado a SOFASA
 
-    # --- Pesos de prioridad (unidades relativas, orden del PDF: ruptura > estándar > demurrage > capacidades > Suppla) ---
+    # --- Pesos de prioridad (Suppla ya no tiene peso propio: entra al objetivo con USD reales) ---
     cost_rupture: float = 1000.0        # Prioridad 1 (Ruptura): penalización por contenedor-día de retraso vs need_by real
     cost_rupture_event: float = 500.0   # Prioridad 1 (Ruptura): penalización fija por evento de ruptura (prioriza salvar)
     cost_em_objetivo_dia: float = 100.0 # Prioridad 2 (Estándar / Fecha objetivo): penalización por día de desviación vs em_objetivo
     cost_alert_day: float = 20.0        # Prioridad 3 (Estándar / Alertas): penalización por contenedor-día más allá de l_obj
-    cost_suppla_day: float = 1.0        # Prioridad 5 (Suppla): costo por contenedor-día almacenado en Suppla
 
     # --- límite de tiempo del solver (constante interna, no editable por el usuario) ---
     solver_time_limit_s: float = 60.0

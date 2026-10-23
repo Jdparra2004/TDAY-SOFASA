@@ -29,6 +29,7 @@ logger = logging.getLogger(__name__)
 class OptimizationResult:
     plan: Plan
     status: str
+    solver_status_raw: str
     objective_value: float
     best_objective_bound: float
     gap: float
@@ -53,22 +54,32 @@ def optimize_plan(
     cap_traslado = params.cap_traslado()
     cap_suppla_week = params.cap_suppla_weekly()
 
+    # Generar baseline_plan primero para garantizar que la ventana contenga siempre la solución base
+    bplan = baseline_plan(containers, params)
+
     windows = {}
     active_containers = []
     for c in containers:
         start = max(0, c.eta)
         direct_start = max(0, c.eta + params.l_min)
-        end = min(H - 1, max(start + params.max_wait_days, direct_start))
+        entry = bplan.get(c.id)
+        baseline_em = entry.em_day if entry is not None else direct_start
+        baseline_sup = entry.suppla_in_day if (entry is not None and entry.suppla_in_day is not None) else baseline_em
+        # B1: La ventana debe contener siempre la solución de la línea base
+        end = min(H - 1, max(start + params.max_wait_days, direct_start, baseline_em, baseline_sup))
         windows[c.id] = (start, end, direct_start)
         active_containers.append(c)
 
     if not active_containers:
-        return OptimizationResult(plan={}, status="NO_CONTAINERS_IN_HORIZON", objective_value=float("nan"),
-                                  best_objective_bound=float("nan"), gap=0.0, solve_time_s=0.0, kpis={}, deferred=[])
+        return OptimizationResult(
+            plan={}, status="SIN_SOLUCION", solver_status_raw="NO_CONTAINERS_IN_HORIZON",
+            objective_value=float("nan"), best_objective_bound=float("nan"), gap=0.0,
+            solve_time_s=0.0, kpis={}, deferred=[]
+        )
 
-    yd: Dict[tuple, cp_model.IntVar] = {}
-    zs: Dict[tuple, cp_model.IntVar] = {}
-    ys: Dict[tuple, cp_model.IntVar] = {}
+    yd_vars: Dict[str, Dict[int, cp_model.IntVar]] = {}
+    zs_vars: Dict[str, Dict[int, cp_model.IntVar]] = {}
+    ys_vars: Dict[str, Dict[int, cp_model.IntVar]] = {}
     use_suppla: Dict[str, cp_model.IntVar] = {}
     pending: Dict[str, cp_model.IntVar] = {}
     em_day: Dict[str, cp_model.IntVar] = {}
@@ -86,22 +97,28 @@ def optimize_plan(
         big = H + max(0, -c.eta) + (max(0, -c.need_by) if has_rup else 0) + 1
 
         yd_terms = []
+        yd_dict = {}
         for t in range(direct_start, end + 1):
             v = model.NewBoolVar(f"yd_{c.id}_{t}")
-            yd[(c.id, t)] = v
+            yd_dict[t] = v
             yd_terms.append(v)
+        yd_vars[c.id] = yd_dict
 
         zs_terms = []
+        zs_dict = {}
         for t in range(start, end + 1):
             v = model.NewBoolVar(f"zs_{c.id}_{t}")
-            zs[(c.id, t)] = v
+            zs_dict[t] = v
             zs_terms.append(v)
+        zs_vars[c.id] = zs_dict
 
         ys_terms = []
+        ys_dict = {}
         for t in range(direct_start, end + 1):
             v = model.NewBoolVar(f"ys_{c.id}_{t}")
-            ys[(c.id, t)] = v
+            ys_dict[t] = v
             ys_terms.append(v)
+        ys_vars[c.id] = ys_dict
 
         u = model.NewBoolVar(f"use_suppla_{c.id}")
         use_suppla[c.id] = u
@@ -113,13 +130,13 @@ def optimize_plan(
         model.Add(sum(zs_terms) == u)
 
         em = model.NewIntVar(start, H, f"em_{c.id}")
-        model.Add(em == sum(t * yd[(c.id, t)] for t in range(direct_start, end + 1))
-                  + sum(t * ys[(c.id, t)] for t in range(direct_start, end + 1))
+        model.Add(em == sum(t * yd_dict[t] for t in range(direct_start, end + 1) if t in yd_dict)
+                  + sum(t * ys_dict[t] for t in range(direct_start, end + 1) if t in ys_dict)
                   + H * pend)
         em_day[c.id] = em
 
         sin_ = model.NewIntVar(0, end, f"suppla_in_{c.id}")
-        model.Add(sin_ == sum(t * zs[(c.id, t)] for t in range(start, end + 1)))
+        model.Add(sin_ == sum(t * zs_dict[t] for t in range(start, end + 1) if t in zs_dict))
         suppla_in_day[c.id] = sin_
 
         model.Add(em >= sin_ + params.min_suppla_stay_days).OnlyEnforceIf(u)
@@ -166,10 +183,12 @@ def optimize_plan(
     for t in range(H):
         terms = []
         for c in active_containers:
-            if (c.id, t) in yd:
-                terms.append(yd[(c.id, t)])
-            if (c.id, t) in ys:
-                terms.append(ys[(c.id, t)])
+            yd_dict = yd_vars.get(c.id, {})
+            ys_dict = ys_vars.get(c.id, {})
+            if t in yd_dict:
+                terms.append(yd_dict[t])
+            if t in ys_dict:
+                terms.append(ys_dict[t])
         if terms:
             model.Add(sum(terms) <= int(round(cap_sofasa[t])))
 
@@ -177,12 +196,12 @@ def optimize_plan(
     for t in range(H):
         days_by_week.setdefault(params.week_of(t), []).append(t)
     for w, days in days_by_week.items():
-        terms = [zs[(c.id, t)] for c in active_containers for t in days if (c.id, t) in zs]
+        terms = [zs_vars[c.id][t] for c in active_containers for t in days if c.id in zs_vars and t in zs_vars[c.id]]
         if terms:
             model.Add(sum(terms) <= int(round(cap_suppla_week[w])))
 
     for t in range(H):
-        terms = [ys[(c.id, t)] for c in active_containers if (c.id, t) in ys]
+        terms = [ys_vars[c.id][t] for c in active_containers if c.id in ys_vars and t in ys_vars[c.id]]
         if terms:
             model.Add(sum(terms) <= int(round(cap_traslado[t])))
 
@@ -201,31 +220,32 @@ def optimize_plan(
             objective_terms.append(int(round(params.USD_DEMURRAGE_DIA * scale)) * s_slack[c.id])
         if params.cost_alert_day > 0:
             objective_terms.append(int(round(params.cost_alert_day * scale)) * a_slack[c.id])
-        if params.cost_suppla_day > 0:
-            objective_terms.append(int(round(params.cost_suppla_day * scale)) * suppla_days[c.id])
-        if params.USD_TRASLADO_SUPPLA > 0:
-            objective_terms.append(int(round(params.USD_TRASLADO_SUPPLA * scale)) * use_suppla[c.id])
+        if params.USD_SUPPLA_DIA > 0:
+            objective_terms.append(int(round(params.USD_SUPPLA_DIA * scale)) * suppla_days[c.id])
 
     model.Minimize(sum(objective_terms))
-    fallback_plan: Plan = {}
 
-    # Solución inicial (hint): la línea base es factible; el solver arranca desde ahí y solo puede mejorarla.
+    # B3: Solución inicial (hint) eficiente indexada por contenedor (sin bucles anidados)
     try:
-        hint = baseline_plan(active_containers, params)
-        fallback_plan = hint
         for c in active_containers:
-            e = hint.get(c.id)
-            for (cid, t), v in yd.items():
-                if cid == c.id:
-                    model.AddHint(v, int(e is not None and e.route == "direct" and e.em_day == t))
-            for (cid, t), v in ys.items():
-                if cid == c.id:
-                    model.AddHint(v, int(e is not None and e.route == "suppla" and e.em_day == t))
-            for (cid, t), v in zs.items():
-                if cid == c.id:
-                    model.AddHint(v, int(e is not None and e.route == "suppla" and e.suppla_in_day == t))
-            model.AddHint(use_suppla[c.id], int(e is not None and e.route == "suppla"))
-            model.AddHint(pending[c.id], int(e is None))
+            e = bplan.get(c.id)
+            yd_dict = yd_vars.get(c.id, {})
+            ys_dict = ys_vars.get(c.id, {})
+            zs_dict = zs_vars.get(c.id, {})
+            if e is None:
+                model.AddHint(pending[c.id], 1)
+                model.AddHint(use_suppla[c.id], 0)
+            else:
+                model.AddHint(pending[c.id], 0)
+                model.AddHint(use_suppla[c.id], int(e.route == "suppla"))
+                if e.route == "direct":
+                    if e.em_day in yd_dict:
+                        model.AddHint(yd_dict[e.em_day], 1)
+                elif e.route == "suppla":
+                    if e.em_day in ys_dict:
+                        model.AddHint(ys_dict[e.em_day], 1)
+                    if e.suppla_in_day is not None and e.suppla_in_day in zs_dict:
+                        model.AddHint(zs_dict[e.suppla_in_day], 1)
     except Exception as exc:  # el hint es opcional
         logger.warning("No se pudo construir el hint de la línea base: %s", exc)
 
@@ -233,15 +253,19 @@ def optimize_plan(
     solver.parameters.max_time_in_seconds = time_limit_s if time_limit_s is not None else params.solver_time_limit_s
     solver.parameters.num_search_workers = workers
     solver.parameters.random_seed = seed
-    solver.parameters.repair_hint = True
     if verbose:
         solver.parameters.log_search_progress = True
     status = solver.Solve(model)
 
-    status_name = solver.StatusName(status)
-    if status_name != "OPTIMAL":
-        logger.warning("Solver status: %s. La solución no es estrictamente óptima.", status_name)
-        print(f"ADVERTENCIA: El solver devolvió status {status_name} (no OPTIMAL).")
+    raw_status_name = solver.StatusName(status)
+    
+    # B4: status solo en {"OPTIMAL","FEASIBLE","FALLBACK_LINEA_BASE","SIN_SOLUCION"}
+    if status == cp_model.OPTIMAL:
+        status_str = "OPTIMAL"
+    elif status == cp_model.FEASIBLE:
+        status_str = "FEASIBLE"
+    else:
+        status_str = "SIN_SOLUCION"
 
     plan: Plan = {}
     deferred: List[str] = []
@@ -249,20 +273,11 @@ def optimize_plan(
         for c in active_containers:
             if solver.Value(pending[c.id]) == 1:
                 deferred.append(c.id)
-                c.estado = EstadoContenedor.DIFERIDO_SIN_CUPO
                 continue
             em = solver.Value(em_day[c.id])
             if em >= H:
                 deferred.append(c.id)
-                c.estado = EstadoContenedor.DIFERIDO_SIN_CUPO
                 continue
-
-            if em < horizon:
-                c.estado = EstadoContenedor.PROGRAMADO_EN_HORIZONTE
-            elif horizon <= em < H:
-                c.estado = EstadoContenedor.EM_PROYECTADA
-            else:
-                c.estado = EstadoContenedor.DIFERIDO_SIN_CUPO
 
             if solver.Value(use_suppla[c.id]) == 1:
                 plan[c.id] = PlanEntry(
@@ -274,38 +289,32 @@ def optimize_plan(
             else:
                 plan[c.id] = PlanEntry(container_id=c.id, route="direct", em_day=em)
     else:
-        # El solver no encontró solución en el tiempo dado: se reporta explícitamente y se usa la línea base (factible)
-        status_name = f"{status_name}_RESPALDO_LINEA_BASE"
-        logger.warning("Sin solución del solver; se devuelve la línea base marcada como respaldo (%s).", status_name)
-        plan = dict(fallback_plan)
-        for c in active_containers:
-            e = plan.get(c.id)
-            if e is None:
-                deferred.append(c.id)
-                c.estado = EstadoContenedor.DIFERIDO_SIN_CUPO
-            else:
-                c.estado = EstadoContenedor.PROGRAMADO_EN_HORIZONTE if e.em_day < horizon else EstadoContenedor.EM_PROYECTADA
+        plan = {}
+        deferred = [c.id for c in active_containers]
 
-    # Garantía: el plan reportado nunca es peor que la línea base según el mismo objetivo ponderado
-    if status in (cp_model.OPTIMAL, cp_model.FEASIBLE) and fallback_plan:
-        if weighted_objective(active_containers, plan, params) > weighted_objective(active_containers, fallback_plan, params) + 1e-6:
-            status_name = f"{status_name}_SIN_MEJORA_USA_LINEA_BASE"
-            plan = dict(fallback_plan)
-            deferred = [c.id for c in active_containers if c.id not in plan]
-            for c in active_containers:
-                e = plan.get(c.id)
-                c.estado = (EstadoContenedor.DIFERIDO_SIN_CUPO if e is None else
-                            EstadoContenedor.PROGRAMADO_EN_HORIZONTE if e.em_day < horizon else EstadoContenedor.EM_PROYECTADA)
+    # B4: Garantía: el plan reportado nunca es peor que la línea base según el mismo objetivo ponderado
+    wo_base = weighted_objective(active_containers, bplan, params)
+    wo_opt = weighted_objective(active_containers, plan, params) if plan else float("inf")
+
+    if not plan or wo_opt > wo_base + 1e-6:
+        status_str = "FALLBACK_LINEA_BASE"
+        plan = dict(bplan)
+        deferred = [c.id for c in active_containers if c.id not in plan]
+        wo_opt = wo_base
+        print(f"AVISO: Se aplica FALLBACK_LINEA_BASE (objetivo solver = {wo_opt:.1f} vs base = {wo_base:.1f}).")
+
     planned = [c for c in active_containers if c.id in plan]
     kpis = _compute_plan_kpis(planned, plan, params)
-    has_sol = status in (cp_model.OPTIMAL, cp_model.FEASIBLE)
-    obj_val = solver.ObjectiveValue() / scale if has_sol else float("nan")
-    best_bound = solver.BestObjectiveBound() / scale if has_sol else float("nan")
+
+    # B4: objective_value y gap calculados sobre el plan DEVUELTO (weighted_objective)
+    obj_val = wo_opt
+    best_bound = solver.BestObjectiveBound() / scale if status in (cp_model.OPTIMAL, cp_model.FEASIBLE) else obj_val
     gap = abs(obj_val - best_bound) / (abs(obj_val) + 1e-9) if not math.isnan(obj_val) else 0.0
 
     return OptimizationResult(
         plan=plan,
-        status=status_name,
+        status=status_str,
+        solver_status_raw=raw_status_name,
         objective_value=obj_val,
         best_objective_bound=best_bound,
         gap=gap,
@@ -359,7 +368,6 @@ def baseline_plan(containers: List[Container], params: Params) -> Plan:
     cap_s = params.cap_sofasa()
     cap_t = params.cap_traslado()
     cap_w = params.cap_suppla_weekly()
-    horizon = params.horizon
     H = params.horizon_solver
     used_s, used_t, used_w, plan = [0]*H, [0]*H, {}, {}
     key = lambda c: (c.em_objetivo if c.em_objetivo is not None else c.eta + params.l_obj, c.eta)
@@ -369,12 +377,6 @@ def baseline_plan(containers: List[Container], params: Params) -> Plan:
         if d is not None and d - c.eta <= params.l_max:
             used_s[d] += 1
             plan[c.id] = PlanEntry(c.id, "direct", d)
-            if d < horizon:
-                c.estado = EstadoContenedor.PROGRAMADO_EN_HORIZONTE
-            elif horizon <= d < H:
-                c.estado = EstadoContenedor.EM_PROYECTADA
-            else:
-                c.estado = EstadoContenedor.DIFERIDO_SIN_CUPO
             continue
         placed = False
         for s in range(max(0, c.eta), min(H, c.eta + params.l_max + 1)):
@@ -389,22 +391,10 @@ def baseline_plan(containers: List[Container], params: Params) -> Plan:
             used_s[e] += 1
             plan[c.id] = PlanEntry(c.id, "suppla", e, s)
             placed = True
-            if e < horizon:
-                c.estado = EstadoContenedor.PROGRAMADO_EN_HORIZONTE
-            elif horizon <= e < H:
-                c.estado = EstadoContenedor.EM_PROYECTADA
-            else:
-                c.estado = EstadoContenedor.DIFERIDO_SIN_CUPO
             break
         if not placed and d is not None:
             used_s[d] += 1
             plan[c.id] = PlanEntry(c.id, "direct", d)
-            if d < horizon:
-                c.estado = EstadoContenedor.PROGRAMADO_EN_HORIZONTE
-            elif horizon <= d < H:
-                c.estado = EstadoContenedor.EM_PROYECTADA
-            else:
-                c.estado = EstadoContenedor.DIFERIDO_SIN_CUPO
         elif not placed:
-            c.estado = EstadoContenedor.DIFERIDO_SIN_CUPO
+            pass
     return plan

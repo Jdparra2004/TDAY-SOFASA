@@ -79,7 +79,7 @@ def run_simulation(containers: List[Container], params: Params, plan: Plan) -> S
             "tiene_ruptura_real": c.need_by is not None,
             "estado": k["estado"], "salida_puerto": k["salida_puerto"], "dias_puerto": k["dias_puerto"],
             "dias_demurrage": k["dias_demurrage"], "usd_demurrage": k["usd_demurrage"],
-            "usd_traslado": k["usd_traslado"], "demurrage_estimado": k["demurrage_estimado"],
+            "usd_suppla": k["usd_suppla"], "demurrage_estimado": k["demurrage_estimado"],
         })
     container_df = pd.DataFrame(rows)
     return SimulationResult(daily_df, container_df, _compute_kpis(container_df, daily_df, params, costs), costs)
@@ -130,7 +130,7 @@ def _compute_kpis(container_df: pd.DataFrame, daily_df: pd.DataFrame, params: Pa
         "cumplimiento_lt_10": 100 * (lt <= params.l_obj).sum() / nl if nl else 0.0,
         "cumplimiento_lt_12": 100 * (lt <= params.l_max).sum() / nl if nl else 0.0,
         "usd_demurrage": costs.totals["usd_demurrage"],
-        "usd_traslado": costs.totals["usd_traslado"],
+        "usd_suppla": costs.totals["usd_suppla"],
         "usd_total": costs.totals["usd_total"],
         "dias_demurrage": costs.totals["dias_demurrage"],
         "usd_demurrage_previo_dia0": costs.acumulado_previo_usd,

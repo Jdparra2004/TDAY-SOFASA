@@ -55,8 +55,8 @@ def plot_suppla_occupancy(daily_baseline: pd.DataFrame, daily_opt: pd.DataFrame,
 
 
 def plot_cost_comparison(costos_base, costos_opt, title: str = "Costo en USD: línea base vs. plan optimizado") -> Any:
-    """Costo por componente (demurrage, traslados Suppla→SOFASA, total) de ambos planes."""
-    comps = [("Demurrage", "usd_demurrage"), ("Traslados Suppla", "usd_traslado"), ("Total", "usd_total")]
+    """Costo por componente (demurrage, almacenamiento Suppla, total) de ambos planes."""
+    comps = [("Demurrage", "usd_demurrage"), ("Almacenamiento Suppla", "usd_suppla"), ("Total", "usd_total")]
     fig, ax = plt.subplots(figsize=(8, 4.6))
     x = range(len(comps))
     w = 0.35
@@ -101,8 +101,10 @@ _KPI_GROUPS = {
         "pct_alerta_preventiva",
         "pct_alerta_critica",
     ],
-    "Rupturas de material (# contenedores)": ["n_rupturas"],
-    "Uso de almacenamiento externo (% contenedores vía Suppla)": ["pct_via_suppla"],
+    "Rupturas y ruteo": [
+        "n_rupturas",
+        "pct_via_suppla",
+    ],
     "Lead time promedio (días)": ["lead_time_promedio"],
 }
 
@@ -151,27 +153,6 @@ def _short_label(key: str) -> str:
         "lead_time_promedio": "lead time prom.",
     }
     return mapping.get(key, key)
-
-
-def plot_container_trajectory(container_df: pd.DataFrame, title: str = "Evolución Cronológica de Tiempos y Retrasos por Contenedor") -> Any:
-    """Gráfica de trayectoria paso a paso en el tiempo (eje X = día ETA de llegada a puerto)."""
-    fig, ax = plt.subplots(figsize=(10, 5))
-    if container_df.empty or "lead_time" not in container_df.columns:
-        ax.text(0.5, 0.5, "Sin datos de contenedores", ha="center", va="center")
-        return fig
-    
-    df_sorted = container_df.sort_values(by="eta").reset_index(drop=True)
-    ax.plot(df_sorted["eta"], df_sorted["lead_time"], marker="o", color=COLOR_SOFASA, linewidth=1.5, label="Lead Time Total (Puerto -> Planta)")
-    if "rupture_days" in df_sorted.columns:
-        ax.plot(df_sorted["eta"], df_sorted["rupture_days"], marker="x", color=COLOR_CRITICO, linewidth=1.2, label="Días de Ruptura (Retraso)")
-        
-    ax.set_xlabel("Día ETA (Llegada a Puerto)")
-    ax.set_ylabel("Días")
-    ax.set_title(title)
-    ax.legend(frameon=True, loc="best")
-    ax.grid(True, linestyle="--", alpha=0.6)
-    fig.tight_layout()
-    return fig
 
 
 def plot_single_container_journey(container_id: str, container_row: pd.Series, title: str = "Mapa de Movimiento del Contenedor") -> Any:
@@ -303,7 +284,7 @@ def _sankey_pad(n: int) -> int:
 
 
 def _panel_height(n: int, max_col_nodes: int) -> int:
-    """Altura (px) del panel para que cada contenedor mida ~_PX_PER_CONTAINER.
+    """Altura (px) del panel para que cada contenedor mida _PX_PER_CONTAINER.
     Plotly reparte: grosor = (altura - (nodos_columna - 1) * pad) / n_contenedores.
     Despejando la altura se obtiene un grosor constante sin importar cuántos haya."""
     pad = _sankey_pad(n)
@@ -368,4 +349,3 @@ def plot_sankey_comparison(
         ],
     )
     return fig
-

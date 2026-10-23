@@ -10,16 +10,22 @@ import re
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
+import sys
 
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.append(str(ROOT))
+
+import numpy as np
 import openpyxl
 import pandas as pd
 import pytest
 
 import main as main_mod
+from src.costs import weighted_objective
+from src.glossary import get_glossary
 from src.model import Params
-from src.pipeline import build_params, prepare_universe, run_pipeline
+from src.pipeline import build_params, prepare_universe, print_validaciones, run_pipeline
 
-ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 FECHA, HORIZONTE, CAP_S, CAP_P, CAP_T, DIAS_T = "2026-10-20", 20, 14, 15, 2, [0, 1, 2, 3, 4]
 BASE = pd.Timestamp(FECHA)
@@ -55,8 +61,8 @@ def leer_tracking_independiente():
 @pytest.fixture(scope="module")
 def corrida(tmp_path_factory):
     out = tmp_path_factory.mktemp("salida")
-    res = main_mod.main(FECHA, HORIZONTE, CAP_S, CAP_P, CAP_T, DIAS_T, data_dir=str(DATA), out_dir=str(out),
-                        time_limit_s=20, workers=1, seed=1)
+    res = main_mod.main(FECHA, HORIZONTE, CAP_S, CAP_P, CAP_T, DIAS_T, data_dir=str(DATA / "1st Data"), out_dir=str(out),
+                        time_limit_s=20, workers=8, seed=1)
     assert res is not None
     return res, out
 
@@ -154,16 +160,17 @@ def test_costos_recalculados_desde_csv(corrida, archivo, columna):
     dem_dias = (dias_puerto - p.l_max).clip(lower=0)
     assert (dem_dias == df["dias_demurrage"]).all()
     usd_dem = dem_dias * p.USD_DEMURRAGE_DIA
-    usd_tras = (df["usd_traslado"] > 0) * p.USD_TRASLADO_SUPPLA
-    assert (df.loc[df["route"] == "suppla", "usd_traslado"] == p.USD_TRASLADO_SUPPLA).all() or not (df["route"] == "suppla").any()
-    total = usd_dem.sum() + usd_tras.sum()
+    suppla_dias = pd.to_numeric(df["em"] - df["suppla_in"], errors="coerce").fillna(0).clip(lower=0)
+    expected_suppla = suppla_dias * p.USD_SUPPLA_DIA
+    assert np.allclose(df["usd_suppla"], expected_suppla, atol=1.0)
+    total = usd_dem.sum() + df["usd_suppla"].sum()
     imp = pd.read_excel(out / "plan_prescriptivo_sofasa.xlsx", sheet_name="Impacto económico")
     fila = imp[(imp["Bloque"] == "Total") & (imp["Concepto"] == "Total (USD)")].iloc[0]
-    assert abs(float(fila[columna]) - total) < 1e-6
+    assert abs(float(fila[columna]) - total) < 1.0
     ah = float(fila["Ahorro (base − óptimo)"])
-    assert abs(ah - (float(fila["Línea base"]) - float(fila["Plan optimizado"]))) < 1e-6
+    assert abs(ah - (float(fila["Línea base"]) - float(fila["Plan optimizado"]))) < 1.0
     prog = pd.read_excel(out / "plan_prescriptivo_sofasa.xlsx", sheet_name="Programacion semanal")
-    assert abs(prog["USD demurrage"].sum() + prog["USD traslado"].sum() - float(fila["Plan optimizado"])) < 1e-6
+    assert abs(prog["USD demurrage"].sum() + prog["USD almacenamiento Suppla"].sum() - float(fila["Plan optimizado"])) < 1.0
 
 
 def test_sin_inventario_ni_consumo_y_fechas_reales(corrida):
@@ -213,3 +220,44 @@ def test_equivalencia_lote_manual(corrida):
     assert {k: (v.route, v.em_day, v.suppla_in_day) for k, v in r2.base_plan.items()} == \
            {k: (v.route, v.em_day, v.suppla_in_day) for k, v in res.base_plan.items()}
     assert [v[1] for v in r2.validaciones if "base" in v[0] or "Embudo" not in v[0]].count("FALLA") == 0
+
+
+def test_weighted_objective_optimal_le_base(corrida):
+    res, _ = corrida
+    p = res.params
+    obj_base = weighted_objective(res.containers, res.base_plan, p)
+    obj_opt = weighted_objective(res.containers, res.plan, p)
+    assert obj_opt <= obj_base + 1e-5
+
+
+def test_no_trajectory_in_src():
+    src_dir = ROOT / "src"
+    for path in src_dir.rglob("*.py"):
+        content = path.read_text(encoding="utf-8")
+        assert not re.search(r"trajectory|trayectoria", content, re.IGNORECASE), f"Encontrado trajectory/trayectoria en {path}"
+
+
+def test_app_no_render_validaciones():
+    app_text = (ROOT / "app.py").read_text(encoding="utf-8")
+    assert "render_validaciones" not in app_text
+
+
+def test_glossary_content(corrida):
+    res, _ = corrida
+    g = get_glossary(res.params)
+    terms = [item[0] for item in g]
+    assert "ETD" in terms
+    assert "ETA" in terms
+    assert "EM objetivo" in terms
+    assert "EM previa" in terms
+    all_text = " ".join(str(item) for item in g)
+    for val in ["PROGRAMABLE", "EXCLUIDO_EN_PLANTA", "FUERA_VENTANA", "PROGRAMADO_EN_HORIZONTE", "EM_PROYECTADA", "DIFERIDO_SIN_CUPO"]:
+        assert val in all_text, f"Falta el valor de estado {val} en el glosario"
+
+
+def test_print_validaciones_no_falla(corrida, capsys):
+    res, _ = corrida
+    print_validaciones(res)
+    captured = capsys.readouterr().out
+    assert "[FALLA]" not in captured
+    assert "OK" in captured

@@ -12,7 +12,7 @@ import pandas as pd
 
 import src.visualize as viz
 from src.export import export_prescriptive_plan
-from src.pipeline import build_params, prepare_universe, run_pipeline
+from src.pipeline import build_params, prepare_universe, run_pipeline, print_validaciones
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.join(BASE_DIR, "output", "datos_reales")
@@ -33,10 +33,9 @@ def main(fecha="2026-10-20", horizonte=20, cap_sofasa=14, cap_suppla_semana=15, 
     print(f"Universo: Tracking {e['tracking_total']} = excluidos {e['excluidos']} + fuera de ventana {e['fuera_ventana']} + programables {e['programables']}")
     print(f"Solver: status={res.solver.status}  gap={res.solver.gap:.4f}")
     for nombre, c in (("Línea base", res.costos_base), ("Plan optimizado", res.costos_opt)):
-        print(f"{nombre}: demurrage {c.totals['usd_demurrage']:,.0f} USD + traslados {c.totals['usd_traslado']:,.0f} USD = {c.totals['usd_total']:,.0f} USD")
+        print(f"{nombre}: demurrage {c.totals['usd_demurrage']:,.0f} USD + almacenamiento Suppla {c.totals['usd_suppla']:,.0f} USD = {c.totals['usd_total']:,.0f} USD")
     print(f"Ahorro (base − óptimo, contra la línea base simulada): {res.ahorro_usd:,.0f} USD")
-    for n, estado, val in res.validaciones:
-        print(f"  [{estado}] {n}: {val}")
+    print_validaciones(res)
 
     xlsx = export_prescriptive_plan(res, os.path.join(out_dir, "plan_prescriptivo_sofasa.xlsx"))
     print(f"Entregable: {xlsx} (+ .csv)")

@@ -172,16 +172,37 @@ def compute_validations(res: Resultado, params: Params, df_universo: pd.DataFram
         cdf = sim.container_df
         bad = int(((cdf["rupture_days"] > 0) & (~cdf["tiene_ruptura_real"])).sum())
         v.append((f"Rupturas solo sobre ruptura real ({nombre})", _ok(bad == 0), f"{bad} rupturas sin fecha real"))
-        dem = ((cdf["salida_puerto"] - cdf["eta"] - params.l_max).clip(lower=0) * params.USD_DEMURRAGE_DIA).sum()
-        tras = (cdf["route"].eq("suppla").sum()) * params.USD_TRASLADO_SUPPLA
-        # contenedores sin plan: la ruta queda "direct" en la sim pero sin traslado; se compara con el costo reportado
+        
+        # Recalcular demurrage y suppla independientemente desde container_df sin usar usd_* del DF
+        dem_recalc = ((cdf["salida_puerto"] - cdf["eta"] - params.l_max).clip(lower=0) * params.USD_DEMURRAGE_DIA).sum()
+        suppla_recalc = 0.0
+        for _, r in cdf.iterrows():
+            if r["route"] == "suppla" and pd.notna(r["suppla_in"]) and pd.notna(r["em"]):
+                dias_s = max(0, int(r["em"]) - int(r["suppla_in"]))
+                suppla_recalc += dias_s * params.USD_SUPPLA_DIA
+        
         rep = sim.costs.totals["usd_total"]
-        trasl_rep = sim.costs.totals["usd_traslado"]
-        v.append((f"Costo recalculado = costo reportado ({nombre})", _ok(abs(dem + trasl_rep - rep) < 1e-6),
-                  f"{dem + trasl_rep:,.0f} vs {rep:,.0f} USD"))
+        v.append((f"Costo recalculado = costo reportado ({nombre})", _ok(abs(dem_recalc + suppla_recalc - rep) < 1e-6),
+                  f"{dem_recalc + suppla_recalc:,.0f} vs {rep:,.0f} USD"))
+
+    for nombre, costs in (("base", res.costos_base), ("optimo", res.costos_opt)):
+        dias_sup_total = costs.totals["dias_suppla"]
+        n_suppla = costs.totals["n_via_suppla"]
+        min_esperado = n_suppla * params.min_suppla_stay_days
+        v.append((f"Dias Suppla >= n_via_suppla * min_suppla_stay_days ({nombre})", _ok(dias_sup_total >= min_esperado),
+                  f"dias {dias_sup_total} >= {min_esperado} (n={n_suppla})"))
+
     estados_ok = res.estados[["estado_base", "estado_optimo"]].notna().all().all()
     v.append(("Todo programable tiene estado", _ok(bool(estados_ok)), f"{len(res.estados)} contenedores"))
     base_c, opt_c = res.costos_base.totals["usd_total"], res.costos_opt.totals["usd_total"]
     v.append(("Ahorro = costo base − costo óptimo", _ok(abs(res.ahorro_usd - (base_c - opt_c)) < 1e-6),
               f"{res.ahorro_usd:,.0f} USD"))
     return v
+
+
+def print_validaciones(res: Resultado) -> None:
+    n_ok = sum(1 for _, est, _ in res.validaciones if est == "OK")
+    n_falla = sum(1 for _, est, _ in res.validaciones if est == "FALLA")
+    for nombre, estado, valor in res.validaciones:
+        print(f"  [{estado}] {nombre}: {valor}")
+    print(f"Validaciones: {n_ok} OK / {n_falla} FALLA")

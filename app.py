@@ -9,7 +9,8 @@ import streamlit as st
 import src.visualize as viz
 from src.data_processor import to_display_df
 from src.export import build_programacion, export_prescriptive_plan
-from src.pipeline import build_params, prepare_universe, run_pipeline
+from src.glossary import get_glossary
+from src.pipeline import build_params, prepare_universe, run_pipeline, print_validaciones
 
 # NOTA: app.py NO contiene lógica de optimización, simulación ni costos: solo llama a src/pipeline.py.
 
@@ -105,8 +106,20 @@ def render_params_panel(prefix: str):
     cap_tras = c1.number_input("Capacidad de traslado por día", min_value=0, value=2, key=f"{prefix}_ct",
                                help="Máximo de contenedores trasladados de Suppla a SOFASA por día.")
     dias = st.multiselect("Días habilitados de traslado", DAY_NAMES, default=DAY_NAMES[:5], key=f"{prefix}_dias",
-                          help="Días de la semana en que se permite el traslado Suppla → SOFASA.")
+                          help="Días de la semana en que se permite el traslado Suppla -> SOFASA.")
     return build_params(fecha, horizonte, cap_sofasa, cap_suppla, cap_tras, [DAY_NAMES.index(d) for d in dias])
+
+
+def render_guia_rapida(params):
+    with st.expander("Guía rápida y glosario de términos", expanded=False):
+        glossary = get_glossary(params)
+        for termino, definicion, opciones in glossary:
+            st.markdown(f"**{termino}**")
+            st.caption(definicion)
+            if opciones:
+                df_op = pd.DataFrame(opciones, columns=["Valor / Opción", "Significado"])
+                st.dataframe(df_op, width="stretch", hide_index=True)
+            st.markdown("---")
 
 
 def _clean(df: pd.DataFrame) -> pd.DataFrame:
@@ -205,26 +218,24 @@ def render_indicadores_resultado(res):
 def render_impacto_economico(res):
     st.markdown("### Impacto económico (indicador)")
     cb, co = res.costos_base.totals, res.costos_opt.totals
+    p = res.params
     c = st.columns(3)
     c[0].metric("Costo línea base (USD)", f"{cb['usd_total']:,.0f}")
     c[1].metric("Costo plan optimizado (USD)", f"{co['usd_total']:,.0f}")
     c[2].metric("Ahorro (USD)", f"{res.ahorro_usd:,.0f}", delta=f"{res.ahorro_usd:,.0f}")
+
+    prom_dias_b = cb["dias_suppla"] / cb["n_via_suppla"] if cb["n_via_suppla"] > 0 else 0.0
+    prom_dias_o = co["dias_suppla"] / co["n_via_suppla"] if co["n_via_suppla"] > 0 else 0.0
+
     desg = pd.DataFrame({
-        "Concepto": ["Demurrage (días)", "Demurrage (USD)", "Traslados Suppla→SOFASA (n)", "Traslados Suppla→SOFASA (USD)", "Total (USD)"],
-        "Línea base": [cb["dias_demurrage"], cb["usd_demurrage"], cb["n_traslados"], cb["usd_traslado"], cb["usd_total"]],
-        "Plan optimizado": [co["dias_demurrage"], co["usd_demurrage"], co["n_traslados"], co["usd_traslado"], co["usd_total"]],
+        "Concepto": ["Demurrage (días)", "Demurrage (USD)", "Contenedores vía Suppla (n)", "Almacenamiento Suppla (días / contenedor-días)", "Almacenamiento Suppla (USD)", "Días promedio en Suppla por contenedor", "Total (USD)"],
+        "Línea base": [cb["dias_demurrage"], cb["usd_demurrage"], cb["n_via_suppla"], cb["dias_suppla"], cb["usd_suppla"], f"{prom_dias_b:.1f}", cb["usd_total"]],
+        "Plan optimizado": [co["dias_demurrage"], co["usd_demurrage"], co["n_via_suppla"], co["dias_suppla"], co["usd_suppla"], f"{prom_dias_o:.1f}", co["usd_total"]],
     })
     st.dataframe(desg, width="stretch", hide_index=True)
     st.caption(f"Demurrage ya acumulado antes del día 0 (inevitable): {res.costos_base.acumulado_previo_dias} días "
                f"= {res.costos_base.acumulado_previo_usd:,.0f} USD. El ahorro es contra la línea base simulada, no contra el gasto histórico real. "
-               "Los USD son un indicador: el solver prioriza ruptura > estándar > demurrage > capacidades > Suppla con pesos relativos.")
-
-
-def render_validaciones(res):
-    st.markdown("### Validaciones")
-    df = pd.DataFrame(res.validaciones, columns=["Validación", "Estado", "Valor encontrado"])
-    df["Estado"] = df["Estado"].map({"OK": "🟢 OK", "FALLA": "🔴 FALLA"})
-    st.dataframe(df, width="stretch", hide_index=True)
+               f"Almacenamiento Suppla = {p.USD_SUPPLA_MES_40FT:,.2f} USD/mes por contenedor de 40 pies, prorrateado por día (supuesto).")
 
 
 def _excel_bytes(res) -> bytes:
@@ -248,9 +259,7 @@ def render_resultados(res, key: str):
     st.markdown("---")
     render_impacto_economico(res)
     st.markdown("---")
-    render_validaciones(res)
-    st.markdown("---")
-    vista = st.radio("Vista de resultados", ["Decisiones por contenedor", "KPI Dashboard", "Diagrama de flujo (Sankey)", "Trayectoria"],
+    vista = st.radio("Vista de resultados", ["Decisiones por contenedor", "KPI Dashboard", "Diagrama de flujo (Sankey)"],
                      horizontal=True, key=f"radio_{key}")
     b, o = res.base, res.optimo
     if vista == "Decisiones por contenedor":
@@ -278,8 +287,6 @@ def render_resultados(res, key: str):
         ids = st.multiselect("Filtrar contenedores (vacío = todos)", options=o.container_df["id"].tolist(), key=f"sk_{key}")
         st.plotly_chart(viz.plot_sankey_comparison(_sub(b, ids), _sub(o, ids)), width="stretch")
         st.info("Puerto se bifurca en Directo a SOFASA o vía Suppla; ambas confluyen en SOFASA → Producción, y de ahí según haya o no ruptura de material.")
-    else:
-        st.pyplot(viz.plot_container_trajectory(o.container_df, "Trayectoria de lead time y retrasos (plan optimizado)"))
 
 
 def _run_and_store(fuente, params, key: str, df_prev=None):
@@ -289,7 +296,9 @@ def _run_and_store(fuente, params, key: str, df_prev=None):
             st.warning("No hay contenedores programables con estos datos y parámetros.")
             st.session_state.pop(f"res_{key}", None)
             return
-        st.session_state[f"res_{key}"] = run_pipeline(programables, params, df_universo)
+        res = run_pipeline(programables, params, df_universo)
+        print_validaciones(res)
+        st.session_state[f"res_{key}"] = res
     st.success("Pipeline completado.")
 
 
@@ -340,17 +349,11 @@ elif st.session_state.view == "manual":
 
     st.title("Proceso Manual e Inserción Interactiva de Contenedores")
     st.markdown("Mismo flujo que el proceso por lote, con pocos contenedores ingresados a mano.")
-    with st.expander("Guía rápida", expanded=False):
-        st.markdown("""
-        1. **ETA:** fecha de arribo al puerto. **Fecha de ruptura (opcional):** si se deja vacía, el contenedor queda *sin ruptura*
-           (no cuenta en los KPIs de ruptura, pero sí en el estándar 7/10/12, demurrage, capacidades y costos).
-        2. Los contenedores con ETA posterior al horizonte se listan como *fuera de ventana*.
-        3. Los 6 parámetros son los mismos que en el modo lote.
-        """)
+    params_m = render_params_panel("manual")
+    render_guia_rapida(params_m)
 
     col_form, col_list = st.columns([1, 1])
     with col_form:
-        params_m = render_params_panel("manual")
         st.markdown("---")
         st.subheader("Registrar contenedor")
         plan_d = pd.Timestamp(params_m.planning_date)
@@ -404,13 +407,8 @@ elif st.session_state.view == "lote":
 
     st.title("Proceso por Lote - Archivos Excel")
     st.markdown("Suba los archivos oficiales. El Tracking es obligatorio y define el universo; DIEL y Prioridades aportan ruptura y EM previa.")
-    with st.expander("Guía rápida", expanded=False):
-        st.markdown("""
-        1. **Universo:** se excluyen solo los contenedores con EM real anterior al día 0; los de ETA posterior al horizonte quedan *fuera de ventana*.
-        2. **Ruptura:** solo existe con fecha real (Prioridades/DIEL). Sin fecha real no hay restricción de ruptura.
-        3. **Costos (USD):** indicador económico (demurrage y traslados); el solver usa pesos de prioridad, no dólares.
-        """)
     params_l = render_params_panel("lote")
+    render_guia_rapida(params_l)
     st.markdown("---")
     st.subheader("Archivos")
     f1, f2, f3 = st.columns(3)

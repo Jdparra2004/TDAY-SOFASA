@@ -8,7 +8,7 @@ Por contenedor:
   dias_puerto    = salida_puerto - ETA        (la ETA puede ser anterior al día 0)
   dias_demurrage = max(0, dias_puerto - l_max)
   usd_demurrage  = dias_demurrage * USD_DEMURRAGE_DIA
-  usd_traslado   = USD_TRASLADO_SUPPLA si va vía Suppla
+  usd_suppla     = dias_suppla * USD_SUPPLA_DIA (si va vía Suppla)
 Contenedores diferidos (sin cupo en horizon_solver): demurrage ESTIMADO hasta el cierre de horizon_solver.
 """
 from __future__ import annotations
@@ -47,33 +47,38 @@ def compute_costs(containers: List[Container], plan: Plan, params: Params) -> Co
         e = plan.get(c.id)
         if e is None:
             em, route, salida, est = None, "sin plan", H, True
+            dias_sup = 0
         else:
             em, route = e.em_day, e.route
             salida = e.suppla_in_day if (route == "suppla" and e.suppla_in_day is not None) else em
             est = False
+            dias_sup = max(0, em - e.suppla_in_day) if (route == "suppla" and e.suppla_in_day is not None) else 0
         estado = _state_of(em, params)
         if estado == ESTADO_DIFERIDO:
             est = True
         dias_puerto = salida - c.eta
         dias_dem = max(0, dias_puerto - params.l_max)
-        # días de demurrage que caen antes del día 0: días (eta+l_max+1 ... salida) con índice < 0
         previo = max(0, min(salida, 0) - (c.eta + params.l_max)) if dias_dem > 0 else 0
+        suppla_cost = dias_sup * params.USD_SUPPLA_DIA if route == "suppla" else 0.0
         rows.append({
             "id": c.id, "estado": estado, "route": route, "em": em, "salida_puerto": salida,
             "dias_puerto": dias_puerto, "dias_demurrage": dias_dem,
             "usd_demurrage": dias_dem * params.USD_DEMURRAGE_DIA,
-            "usd_traslado": params.USD_TRASLADO_SUPPLA if route == "suppla" else 0.0,
+            "usd_suppla": suppla_cost,
+            "dias_suppla": dias_sup,
             "demurrage_estimado": est, "dias_demurrage_previo_dia0": previo,
         })
     df = pd.DataFrame(rows, columns=["id", "estado", "route", "em", "salida_puerto", "dias_puerto", "dias_demurrage",
-                                     "usd_demurrage", "usd_traslado", "demurrage_estimado", "dias_demurrage_previo_dia0"])
+                                     "usd_demurrage", "usd_suppla", "dias_suppla", "demurrage_estimado", "dias_demurrage_previo_dia0"])
 
     def agg(d: pd.DataFrame) -> Dict[str, float]:
         return {
             "n": int(len(d)), "dias_demurrage": int(d["dias_demurrage"].sum()),
             "usd_demurrage": float(d["usd_demurrage"].sum()),
-            "n_traslados": int((d["route"] == "suppla").sum()), "usd_traslado": float(d["usd_traslado"].sum()),
-            "usd_total": float(d["usd_demurrage"].sum() + d["usd_traslado"].sum()),
+            "n_via_suppla": int((d["route"] == "suppla").sum()),
+            "dias_suppla": int(d["dias_suppla"].sum()),
+            "usd_suppla": float(d["usd_suppla"].sum()),
+            "usd_total": float(d["usd_demurrage"].sum() + d["usd_suppla"].sum()),
         }
 
     by_block = {"horizonte": agg(df[df["estado"] == ESTADO_HORIZONTE]),
@@ -100,7 +105,6 @@ def weighted_objective(containers: List[Container], plan: Plan, params: Params) 
                 tot += params.cost_em_objetivo_dia * max(0, em - c.em_objetivo)
         tot += params.USD_DEMURRAGE_DIA * max(0, salida - c.eta - params.l_max)
         tot += params.cost_alert_day * max(0, em - c.eta - params.l_obj)
-        if e is not None and e.route == "suppla":
-            tot += params.cost_suppla_day * (em - (e.suppla_in_day if e.suppla_in_day is not None else em))
-            tot += params.USD_TRASLADO_SUPPLA
+        if e is not None and e.route == "suppla" and e.suppla_in_day is not None:
+            tot += params.USD_SUPPLA_DIA * (em - e.suppla_in_day)
     return tot

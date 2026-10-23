@@ -48,17 +48,20 @@ def build_programacion(res: Resultado) -> pd.DataFrame:
             alertas.append("EM proyectada (fuera del horizonte)")
         if k["estado"] == ESTADO_DIFERIDO:
             alertas.append("Diferido sin cupo (demurrage estimado)")
+        is_suppla = (e is not None and e.route == "suppla")
         rows.append({
             "ID": c.id, "Estado": k["estado"], "Buque": c.vessel, "Origen": c.origen,
             "ETD": _d(base, c.etd), "ETA": _d(base, c.eta),
             "Ruptura": _d(base, c.ruptura_real), "Tipo ruptura": "Real" if c.need_by is not None else "Sin ruptura",
             "EM objetivo": _d(base, c.em_objetivo), "EM previa": _d(base, c.em_previa), "EM plan": _d(base, em),
             "Ruta": {"direct": "Directo", "suppla": "Vía Suppla"}.get(e.route, "N/D") if e is not None else "N/D",
-            "Recepción Suppla": _d(base, e.suppla_in_day) if e is not None and e.route == "suppla" else "N/D",
+            "Recepción Suppla": _d(base, e.suppla_in_day) if is_suppla else "N/D",
             "Cambió": ("N/D" if (c.em_previa is None or em is None) else ("Sí" if em != c.em_previa else "No")),
             "Lead time": lt if lt is not None else "N/D",
             "Días en puerto": int(k["dias_puerto"]), "Días demurrage": int(k["dias_demurrage"]),
-            "USD demurrage": float(k["usd_demurrage"]), "USD traslado": float(k["usd_traslado"]),
+            "USD demurrage": float(k["usd_demurrage"]),
+            "Días en Suppla": int(k["dias_suppla"]) if is_suppla else 0,
+            "USD almacenamiento Suppla": float(k["usd_suppla"]) if is_suppla else 0.0,
             "Alertas": "; ".join(alertas) if alertas else "",
         })
     return pd.DataFrame(rows)
@@ -66,13 +69,17 @@ def build_programacion(res: Resultado) -> pd.DataFrame:
 
 def build_impacto(res: Resultado) -> pd.DataFrame:
     cb, co = res.costos_base, res.costos_opt
+    p = res.params
     filas = []
 
     def bloque(titulo: str, key: str | None):
         b = cb.totals if key is None else cb.by_block[key]
         o = co.totals if key is None else co.by_block[key]
-        for nombre, f in (("Demurrage (días)", "dias_demurrage"), ("Demurrage (USD)", "usd_demurrage"),
-                          ("Traslados Suppla→SOFASA (n)", "n_traslados"), ("Traslados Suppla→SOFASA (USD)", "usd_traslado"),
+        for nombre, f in (("Demurrage (días)", "dias_demurrage"),
+                          ("Demurrage (USD)", "usd_demurrage"),
+                          ("Almacenamiento Suppla (contenedor-días)", "dias_suppla"),
+                          ("Almacenamiento Suppla (USD)", "usd_suppla"),
+                          ("Contenedores vía Suppla (n)", "n_via_suppla"),
                           ("Total (USD)", "usd_total")):
             filas.append({"Bloque": titulo, "Concepto": nombre, "Línea base": b[f], "Plan optimizado": o[f], "Ahorro (base − óptimo)": b[f] - o[f]})
 
@@ -84,7 +91,7 @@ def build_impacto(res: Resultado) -> pd.DataFrame:
                   "Línea base": cb.acumulado_previo_dias, "Plan optimizado": co.acumulado_previo_dias, "Ahorro (base − óptimo)": cb.acumulado_previo_dias - co.acumulado_previo_dias})
     filas.append({"Bloque": "Informativo", "Concepto": "Demurrage ya acumulado antes del día 0 (USD, inevitable)",
                   "Línea base": cb.acumulado_previo_usd, "Plan optimizado": co.acumulado_previo_usd, "Ahorro (base − óptimo)": cb.acumulado_previo_usd - co.acumulado_previo_usd})
-    filas.append({"Bloque": "Nota", "Concepto": "Ahorro contra la línea base simulada (no contra el gasto histórico real). Traslado Suppla = supuesto inicial.",
+    filas.append({"Bloque": "Nota", "Concepto": f"Ahorro contra la línea base simulada. Almacenamiento Suppla = {p.USD_SUPPLA_MES_40FT:,.2f} USD/mes por contenedor de 40 pies, prorrateado por día (supuesto).",
                   "Línea base": "", "Plan optimizado": "", "Ahorro (base − óptimo)": ""})
     return pd.DataFrame(filas)
 
@@ -103,13 +110,14 @@ def build_parametros(res: Resultado) -> pd.DataFrame:
          ("Constante (regla del PDF)", "l_max (máximo antes de demurrage)", p.l_max),
          ("Constante (regla del PDF)", "Días hábiles de holgura para EM objetivo", p.dias_habiles_resta),
          ("Constante (supuesto)", "USD demurrage por día", p.USD_DEMURRAGE_DIA),
-         ("Constante (supuesto)", "USD traslado Suppla por contenedor", p.USD_TRASLADO_SUPPLA),
+         ("Constante (supuesto)", "USD_SUPPLA_MES_40FT", p.USD_SUPPLA_MES_40FT),
+         ("Constante (supuesto)", "DIAS_MES_SUPPLA", p.DIAS_MES_SUPPLA),
+         ("Constante (derivada)", "USD_SUPPLA_DIA", round(p.USD_SUPPLA_DIA, 4)),
          ("Constante (derivada)", "horizon_solver", p.horizon_solver),
          ("Peso de prioridad", "cost_rupture (por día)", p.cost_rupture),
          ("Peso de prioridad", "cost_rupture_event", p.cost_rupture_event),
          ("Peso de prioridad", "cost_em_objetivo_dia", p.cost_em_objetivo_dia),
          ("Peso de prioridad", "cost_alert_day", p.cost_alert_day),
-         ("Peso de prioridad", "cost_suppla_day", p.cost_suppla_day),
          ("Solver", "Estado", res.solver.status), ("Solver", "Gap", round(res.solver.gap, 4))]
     return pd.DataFrame(f + k, columns=["Tipo", "Parámetro", "Valor"])
 
