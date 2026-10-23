@@ -225,7 +225,7 @@ def optimize_plan(
 
     model.Minimize(sum(objective_terms))
 
-    # B3: Solución inicial (hint) eficiente indexada por contenedor (sin bucles anidados)
+    # B3: Solución inicial (hint) completa: todos los valores 0/1 por contenedor
     try:
         for c in active_containers:
             e = bplan.get(c.id)
@@ -237,7 +237,7 @@ def optimize_plan(
                 model.AddHint(v, int(e is not None and e.route == "suppla" and e.suppla_in_day == t))
             model.AddHint(use_suppla[c.id], int(e is not None and e.route == "suppla"))
             model.AddHint(pending[c.id], int(e is None))
-    except Exception as exc:
+    except Exception as exc:  # el hint es opcional
         logger.warning("No se pudo construir el hint de la línea base: %s", exc)
 
     solver = cp_model.CpSolver()
