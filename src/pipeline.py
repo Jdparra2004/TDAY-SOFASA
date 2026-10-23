@@ -15,7 +15,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import pandas as pd
 
-from src.costs import CostResult, compute_costs
+from src.costs import CostResult, compute_costs, weighted_objective
 from src.data_processor import classify_universe, finalize_universe, process_real_tracking_data
 from src.model import Container, Params, Plan
 from src.optimization import OptimizationResult, baseline_plan, optimize_plan
@@ -183,20 +183,24 @@ def compute_validations(res: Resultado, params: Params, df_universo: pd.DataFram
         
         rep = sim.costs.totals["usd_total"]
         v.append((f"Costo recalculado = costo reportado ({nombre})", _ok(abs(dem_recalc + suppla_recalc - rep) < 1e-6),
-                  f"{dem_recalc + suppla_recalc:,.0f} vs {rep:,.0f} USD"))
+                f"{dem_recalc + suppla_recalc:,.0f} vs {rep:,.0f} USD"))
 
     for nombre, costs in (("base", res.costos_base), ("optimo", res.costos_opt)):
         dias_sup_total = costs.totals["dias_suppla"]
         n_suppla = costs.totals["n_via_suppla"]
         min_esperado = n_suppla * params.min_suppla_stay_days
         v.append((f"Dias Suppla >= n_via_suppla * min_suppla_stay_days ({nombre})", _ok(dias_sup_total >= min_esperado),
-                  f"dias {dias_sup_total} >= {min_esperado} (n={n_suppla})"))
+                f"dias {dias_sup_total} >= {min_esperado} (n={n_suppla})"))
 
     estados_ok = res.estados[["estado_base", "estado_optimo"]].notna().all().all()
     v.append(("Todo programable tiene estado", _ok(bool(estados_ok)), f"{len(res.estados)} contenedores"))
+    wo_base = weighted_objective(res.containers, res.base_plan, params)
+    wo_opt = weighted_objective(res.containers, res.plan, params)
+    v.append(("Objetivo ponderado óptimo <= base", _ok(wo_opt <= wo_base + 1e-6),
+            f"óptimo {wo_opt:,.0f} vs base {wo_base:,.0f}"))
     base_c, opt_c = res.costos_base.totals["usd_total"], res.costos_opt.totals["usd_total"]
     v.append(("Ahorro = costo base − costo óptimo", _ok(abs(res.ahorro_usd - (base_c - opt_c)) < 1e-6),
-              f"{res.ahorro_usd:,.0f} USD"))
+            f"{res.ahorro_usd:,.0f} USD"))
     return v
 
 
