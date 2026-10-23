@@ -27,11 +27,11 @@ if not st.session_state.auth_ok:
         pwd = st.text_input("Contraseña de Acceso", type="password")
         submit = st.form_submit_button("Ingresar al Sistema", type="primary")
         if submit:
-            auth_sec = st.secrets.get("auth", {})
-            if not isinstance(auth_sec, dict) or "password" not in auth_sec:
+            try:
+                correct_pwd = st.secrets["auth"]["password"]
+            except (KeyError, FileNotFoundError, AttributeError):
                 st.error("Configuración de autenticación faltante en secrets.toml. Acceso bloqueado.")
                 st.stop()
-            correct_pwd = auth_sec["password"]
             if pwd == correct_pwd:
                 st.session_state.auth_ok = True
                 st.rerun()
