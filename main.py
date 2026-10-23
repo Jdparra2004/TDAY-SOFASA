@@ -70,6 +70,10 @@ if __name__ == "__main__":
     ap.add_argument("--cap-traslado", type=float, default=2, help="Capacidad de traslado por día.")
     ap.add_argument("--dias-traslado", default="0,1,2,3,4", help="Días habilitados de traslado (0=lunes ... 6=domingo), separados por coma.")
     ap.add_argument("--datos", default=None, help="Carpeta con Tracking, Prioridades y DIEL (por ejemplo: data\\3nd Data).")
+    ap.add_argument("--tiempo", type=float, default=None, help="Límite de tiempo del solver en segundos (por defecto, el de Params).")
+    ap.add_argument("--workers", type=int, default=8, help="Hilos del solver.")
+    ap.add_argument("--semilla", type=int, default=0, help="Semilla del solver.")
     a = ap.parse_args()
     main(a.fecha, a.horizonte, a.cap_sofasa, a.cap_suppla_semana, a.cap_traslado,
-        [int(x) for x in a.dias_traslado.split(",")], data_dir=a.datos)
+         [int(x) for x in a.dias_traslado.split(",")], data_dir=a.datos,
+         time_limit_s=a.tiempo, workers=a.workers, seed=a.semilla)

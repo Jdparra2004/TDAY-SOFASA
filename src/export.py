@@ -145,6 +145,32 @@ def build_embudo(res: Resultado) -> pd.DataFrame:
     return pd.DataFrame(filas, columns=["Métrica del embudo", "Valor"])
 
 
+def build_capacidad(res: Resultado) -> pd.DataFrame:
+    """Capacidad utilizada por día en SOFASA, Suppla y traslados (sección 8 del PDF), línea base y plan optimizado."""
+    p, base = res.params, res.base_date
+    b = res.base.daily_df.set_index("day")
+    o = res.optimo.daily_df.set_index("day")
+    filas = []
+    for d in o.index:
+        fecha = base + pd.Timedelta(days=int(d))
+        cap_tras = p.cap_traslado_per_day if fecha.weekday() in p.transfer_days_allowed else 0
+        filas.append({
+            "Día": int(d), "Fecha": fecha.strftime("%Y-%m-%d"),
+            "SOFASA base": int(b.loc[d, "em_sofasa"]) if d in b.index else 0,
+            "SOFASA óptimo": int(o.loc[d, "em_sofasa"]),
+            "Capacidad SOFASA/día": p.cap_sofasa_per_day,
+            "Recepción Suppla base": int(b.loc[d, "recepcion_suppla"]) if d in b.index else 0,
+            "Recepción Suppla óptimo": int(o.loc[d, "recepcion_suppla"]),
+            "Capacidad Suppla/semana": p.cap_suppla_per_week,
+            "Ocupación Suppla base": int(b.loc[d, "ocupacion_suppla"]) if d in b.index else 0,
+            "Ocupación Suppla óptimo": int(o.loc[d, "ocupacion_suppla"]),
+            "Traslados base": int(b.loc[d, "traslados"]) if d in b.index else 0,
+            "Traslados óptimo": int(o.loc[d, "traslados"]),
+            "Capacidad traslado (ese día)": cap_tras,
+        })
+    return pd.DataFrame(filas)
+
+
 def export_prescriptive_plan(res: Resultado, out_path: str = "plan_prescriptivo_sofasa.xlsx") -> str:
     base = res.base_date
     prog = build_programacion(res)
@@ -165,6 +191,7 @@ def export_prescriptive_plan(res: Resultado, out_path: str = "plan_prescriptivo_
     with pd.ExcelWriter(out_path, engine="openpyxl") as w:
         prog.to_excel(w, sheet_name="Programacion semanal", index=False)
         impacto.to_excel(w, sheet_name="Impacto económico", index=False)
+        build_capacidad(res).to_excel(w, sheet_name="Capacidad diaria", index=False)
         proy.to_excel(w, sheet_name="EM proyectada (fuera horizonte)", index=False)
         exc_x.to_excel(w, sheet_name="Excluidos (ya en planta)", index=False)
         fue_x.to_excel(w, sheet_name="Fuera de ventana", index=False)
