@@ -300,7 +300,7 @@ def _run_and_store(fuente, params, key: str, df_prev=None):
             st.warning("No hay contenedores programables con estos datos y parámetros.")
             st.session_state.pop(f"res_{key}", None)
             return
-        res = run_pipeline(programables, params, df_universo)
+        res = run_pipeline(programables, params, df_universo, workers=4)
         print_validaciones(res)
         st.session_state[f"res_{key}"] = res
     st.success("Pipeline completado.")
