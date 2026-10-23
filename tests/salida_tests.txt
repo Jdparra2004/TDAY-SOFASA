@@ -1,0 +1,28 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.1.1, pluggy-1.7.0 -- C:\Python314\python.exe
+cachedir: .pytest_cache
+rootdir: D:\7Universidad_UPB\RETO_SOFASA\sofasa_supply_chain_v1_2
+plugins: anyio-4.14.1, platformdirs-4.13.0, cov-7.1.0
+collecting ... collected 19 items
+
+tests/test_pipeline.py::test_universo_embudo_y_ids PASSED                [  5%]
+tests/test_pipeline.py::test_solo_excluye_em_real_y_ventana PASSED       [ 10%]
+tests/test_pipeline.py::test_eta_coincide_con_tracking PASSED            [ 15%]
+tests/test_pipeline.py::test_capacidades_y_lead_time[contenedores_baseline.csv] PASSED [ 21%]
+tests/test_pipeline.py::test_capacidades_y_lead_time[contenedores_optimizado.csv] PASSED [ 26%]
+tests/test_pipeline.py::test_estados_y_nada_desaparece PASSED            [ 31%]
+tests/test_pipeline.py::test_alertas_en_programacion PASSED              [ 36%]
+tests/test_pipeline.py::test_rupturas_solo_con_fecha_real PASSED         [ 42%]
+tests/test_pipeline.py::test_costos_recalculados_desde_csv[contenedores_baseline.csv-L\xednea base] PASSED [ 47%]
+tests/test_pipeline.py::test_costos_recalculados_desde_csv[contenedores_optimizado.csv-Plan optimizado] PASSED [ 52%]
+tests/test_pipeline.py::test_sin_inventario_ni_consumo_y_fechas_reales PASSED [ 57%]
+tests/test_pipeline.py::test_n_containers_en_kpis_y_csv PASSED           [ 63%]
+tests/test_pipeline.py::test_politica_de_parametros PASSED               [ 68%]
+tests/test_pipeline.py::test_equivalencia_lote_manual PASSED             [ 73%]
+tests/test_pipeline.py::test_weighted_objective_optimal_le_base PASSED   [ 78%]
+tests/test_pipeline.py::test_no_trajectory_in_src PASSED                 [ 84%]
+tests/test_pipeline.py::test_app_no_render_validaciones PASSED           [ 89%]
+tests/test_pipeline.py::test_glossary_content PASSED                     [ 94%]
+tests/test_pipeline.py::test_print_validaciones_no_falla PASSED          [100%]
+
+============================= 19 passed in 54.05s =============================

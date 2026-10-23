@@ -353,7 +353,10 @@ def _name_of(obj: Any, idx: int) -> str:
 
 
 def _expand_sources(sources: Any) -> List[Source]:
-    items = list(sources) if isinstance(sources, (list, tuple)) else [sources]
+    if isinstance(sources, (str, os.PathLike, bytes, bytearray, io.IOBase, Source)) or not isinstance(sources, (list, tuple, set)):
+        items = [sources]
+    else:
+        items = list(sources)
     out: List[Source] = []
     for it in items:
         if it is None:
@@ -362,20 +365,43 @@ def _expand_sources(sources: Any) -> List[Source]:
         o = s.obj
         if isinstance(o, (str, os.PathLike)) and os.path.isdir(o):
             dir_path = str(o)
+            print(f"Carpeta leída: {dir_path}")
             direct_files = [f for f in os.listdir(dir_path) if not f.startswith("~$") and f.lower().endswith(SUPPORTED_EXT)]
             if not direct_files:
-                subdirs = sorted([os.path.join(dir_path, d) for d in os.listdir(dir_path) if os.path.isdir(os.path.join(dir_path, d))])
-                subdirs = sorted(subdirs, key=lambda p: ("2nd" in p, p), reverse=True)
-                for sub in subdirs:
-                    if any(not f.startswith("~$") and f.lower().endswith(SUPPORTED_EXT) for f in os.listdir(sub)):
-                        dir_path = sub
-                        break
-            for fn in sorted(os.listdir(dir_path)):
-                if not fn.startswith(("~$", ".")) and fn.lower().endswith(SUPPORTED_EXT):
-                    out.append(Source(os.path.join(dir_path, fn)))
+                subdirs = [os.path.join(dir_path, d) for d in os.listdir(dir_path) if os.path.isdir(os.path.join(dir_path, d))]
+                valid_subdirs = [sub for sub in subdirs if any(not f.startswith("~$") and f.lower().endswith(SUPPORTED_EXT) for f in os.listdir(sub))]
+                if len(valid_subdirs) == 1:
+                    dir_path = valid_subdirs[0]
+                    print(f"Subcarpeta leída: {dir_path}")
+                    direct_files = [f for f in os.listdir(dir_path) if not f.startswith("~$") and f.lower().endswith(SUPPORTED_EXT)]
+                else:
+                    raise ValueError(f"Carpeta sin archivos soportados o múltiples subcarpetas sin archivos claros: {dir_path}. Por favor especifique la ruta exacta de la carpeta con los archivos.")
+            for fn in sorted(direct_files):
+                p = os.path.join(dir_path, fn)
+                low = fn.lower()
+                tag = s.tag
+                master = s.master
+                if tag is None:
+                    if "tracking" in low:
+                        tag = ""
+                        master = True
+                    elif "diel" in low or "programación" in low or "programacion" in low:
+                        tag = "diel"
+                    elif "prioridades" in low:
+                        tag = "prio"
+                out.append(Source(p, tag=tag, name=fn, master=master))
             continue
         if isinstance(o, (bytes, bytearray)):
             s = Source(io.BytesIO(bytes(o)), s.tag, s.name, s.master)
+        if s.tag is None and s.name:
+            low = s.name.lower()
+            if "tracking" in low:
+                s.tag = ""
+                s.master = True
+            elif "diel" in low or "programación" in low or "programacion" in low:
+                s.tag = "diel"
+            elif "prioridades" in low:
+                s.tag = "prio"
         out.append(s)
     seen: Dict[str, int] = {}
     for i, s in enumerate(out, 1):
@@ -1167,41 +1193,6 @@ def _legacy_aliases(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def _legacy_sources(tracking_file: Any, diel_file: Any, prio_file: Any) -> List[Source]:
-    srcs: List[Source] = []
-    if tracking_file is not None and isinstance(tracking_file, (str, os.PathLike)) and os.path.isdir(tracking_file):
-        dir_path = str(tracking_file)
-        direct_files = [f for f in os.listdir(dir_path) if not f.startswith("~$") and f.lower().endswith(SUPPORTED_EXT)]
-        if not direct_files:
-            subdirs = sorted([os.path.join(dir_path, d) for d in os.listdir(dir_path) if os.path.isdir(os.path.join(dir_path, d))])
-            subdirs = sorted(subdirs, key=lambda p: ("2nd" in p, p), reverse=True)
-            for sub in subdirs:
-                if any(not f.startswith("~$") and f.lower().endswith(SUPPORTED_EXT) for f in os.listdir(sub)):
-                    dir_path = sub
-                    break
-        for fn in sorted(os.listdir(dir_path)):
-            low = fn.lower()
-            p = os.path.join(dir_path, fn)
-            if fn.startswith("~$") or not low.endswith(SUPPORTED_EXT):
-                continue
-            if "tracking" in low:
-                srcs.append(Source(p, tag="", master=True))
-            elif "diel" in low or "programación" in low or "programacion" in low:
-                srcs.append(Source(p, tag="diel"))
-            elif "prioridades" in low:
-                srcs.append(Source(p, tag="prio"))
-            else:
-                srcs.append(Source(p))
-        return srcs
-    if tracking_file is not None:
-        srcs.append(Source(tracking_file, tag="", master=True))
-    if diel_file is not None:
-        srcs.append(Source(diel_file, tag="diel"))
-    if prio_file is not None:
-        srcs.append(Source(prio_file, tag="prio"))
-    return srcs
-
-
 def process_real_tracking_dataframe(
     tracking_file: Optional[FileSource] = None,
     diel_file: Optional[FileSource] = None,
@@ -1211,12 +1202,22 @@ def process_real_tracking_dataframe(
     base_date: Optional[pd.Timestamp] = None,
     **extra: Any,
 ) -> pd.DataFrame:
-    base_dt = pd.Timestamp(base_date).normalize() if base_date is not None else pd.Timestamp("2026-10-20")
+    if base_date is None:
+        raise ValueError("base_date es obligatorio")
+    base_dt = pd.Timestamp(base_date).normalize()
     
     if tracking_file is None and diel_file is None and prio_file is None:
         raise ValueError("El Tracking es obligatorio: define el universo o sube un archivo.")
 
-    srcs = _legacy_sources(tracking_file, diel_file, prio_file)
+    src_list = []
+    if tracking_file is not None:
+        src_list.append(Source(tracking_file, tag="", master=True))
+    if diel_file is not None:
+        src_list.append(Source(diel_file, tag="diel"))
+    if prio_file is not None:
+        src_list.append(Source(prio_file, tag="prio"))
+
+    srcs = _expand_sources(src_list)
     if not srcs:
         raise ValueError("El Tracking es obligatorio: no se encontraron fuentes de datos válidas.")
 
@@ -1366,7 +1367,9 @@ def process_real_tracking_data(
 ) -> Tuple[List[Container], pd.DataFrame]:
     """Procesa los archivos, clasifica el universo y devuelve (containers_programables, df_universo).
     df.attrs: excluded_df, fuera_ventana_df, no_tracking_df, embudo, tracking_ids."""
-    base_dt = pd.Timestamp(base_date).normalize() if base_date is not None else pd.Timestamp("2026-10-20")
+    if base_date is None:
+        raise ValueError("base_date es obligatorio")
+    base_dt = pd.Timestamp(base_date).normalize()
     p = params if params is not None else Params()
     df = process_real_tracking_dataframe(tracking_file, diel_file, prio_file, base_date=base_dt, **kwargs)
     if df.empty:
@@ -1401,7 +1404,9 @@ def to_display_df(containers_o_df: Union[Sequence[Container], pd.DataFrame],
     EM previa, Estado del universo. Fechas AAAA-MM-DD y 'N/D' si falta el dato (nunca None/NaT/número de día)."""
     if base_date is None and isinstance(containers_o_df, pd.DataFrame):
         base_date = containers_o_df.attrs.get("base_date")
-    base_dt = pd.Timestamp(base_date).normalize() if base_date is not None else pd.Timestamp("2026-10-20")
+    if base_date is None:
+        raise ValueError("base_date es obligatorio")
+    base_dt = pd.Timestamp(base_date).normalize()
     rows = []
     if isinstance(containers_o_df, pd.DataFrame):
         df = containers_o_df

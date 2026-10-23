@@ -207,7 +207,7 @@ def optimize_plan(
 
     # Función objetivo
     objective_terms = []
-    scale = 100
+    scale = int(params.DIAS_MES_SUPPLA*100) # Entero exacto
     for c in active_containers:
         has_rup = c.need_by is not None
         if has_rup and params.cost_rupture > 0:
@@ -229,30 +229,22 @@ def optimize_plan(
     try:
         for c in active_containers:
             e = bplan.get(c.id)
-            yd_dict = yd_vars.get(c.id, {})
-            ys_dict = ys_vars.get(c.id, {})
-            zs_dict = zs_vars.get(c.id, {})
-            if e is None:
-                model.AddHint(pending[c.id], 1)
-                model.AddHint(use_suppla[c.id], 0)
-            else:
-                model.AddHint(pending[c.id], 0)
-                model.AddHint(use_suppla[c.id], int(e.route == "suppla"))
-                if e.route == "direct":
-                    if e.em_day in yd_dict:
-                        model.AddHint(yd_dict[e.em_day], 1)
-                elif e.route == "suppla":
-                    if e.em_day in ys_dict:
-                        model.AddHint(ys_dict[e.em_day], 1)
-                    if e.suppla_in_day is not None and e.suppla_in_day in zs_dict:
-                        model.AddHint(zs_dict[e.suppla_in_day], 1)
-    except Exception as exc:  # el hint es opcional
+            for t, v in yd_vars[c.id].items():
+                model.AddHint(v, int(e is not None and e.route == "direct" and e.em_day == t))
+            for t, v in ys_vars[c.id].items():
+                model.AddHint(v, int(e is not None and e.route == "suppla" and e.em_day == t))
+            for t, v in zs_vars[c.id].items():
+                model.AddHint(v, int(e is not None and e.route == "suppla" and e.suppla_in_day == t))
+            model.AddHint(use_suppla[c.id], int(e is not None and e.route == "suppla"))
+            model.AddHint(pending[c.id], int(e is None))
+    except Exception as exc:
         logger.warning("No se pudo construir el hint de la línea base: %s", exc)
 
     solver = cp_model.CpSolver()
     solver.parameters.max_time_in_seconds = time_limit_s if time_limit_s is not None else params.solver_time_limit_s
     solver.parameters.num_search_workers = workers
     solver.parameters.random_seed = seed
+    solver.parameters.random_seed = True
     if verbose:
         solver.parameters.log_search_progress = True
     status = solver.Solve(model)
@@ -297,20 +289,21 @@ def optimize_plan(
     wo_opt = weighted_objective(active_containers, plan, params) if plan else float("inf")
 
     if not plan or wo_opt > wo_base + 1e-6:
+        print(f"AVISO: FALLBACK_LINEA_BASE (objetivo del solver = {wo_opt:.1f} vs base = {wo_base:.1f}).")
         status_str = "FALLBACK_LINEA_BASE"
         plan = dict(bplan)
         deferred = [c.id for c in active_containers if c.id not in plan]
         wo_opt = wo_base
-        print(f"AVISO: Se aplica FALLBACK_LINEA_BASE (objetivo solver = {wo_opt:.1f} vs base = {wo_base:.1f}).")
 
     planned = [c for c in active_containers if c.id in plan]
     kpis = _compute_plan_kpis(planned, plan, params)
 
     # B4: objective_value y gap calculados sobre el plan DEVUELTO (weighted_objective)
+    has_sol = status in (cp_model.OPTIMAL, cp_model.FEASIBLE)
     obj_val = wo_opt
-    best_bound = solver.BestObjectiveBound() / scale if status in (cp_model.OPTIMAL, cp_model.FEASIBLE) else obj_val
-    gap = abs(obj_val - best_bound) / (abs(obj_val) + 1e-9) if not math.isnan(obj_val) else 0.0
-
+    best_bound = solver.BestObjectiveBound() / scale if has_sol else float("nan")
+    gap = abs(obj_val - best_bound) / (abs(obj_val) + 1e-9) if has_sol else float("nan")
+    
     return OptimizationResult(
         plan=plan,
         status=status_str,
