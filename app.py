@@ -191,11 +191,18 @@ def render_indicadores_resultado(res):
     st.markdown("### Resultado: línea base vs. plan optimizado")
     b, o = res.base.kpis, res.optimo.kpis
     st.caption("Rupturas: solo cuentan los contenedores con fecha real de ruptura (Prioridades/DIEL).")
-    est_ok = res.solver.status == "OPTIMAL"
-    if not est_ok:
-        st.warning(f"Estado del solver: {res.solver.status} (gap {res.solver.gap:.1%}). La solución puede no ser estrictamente óptima.")
+    stt = res.solver.status
+    gap_txt = "N/D" if pd.isna(res.solver.gap) else f"{res.solver.gap:.1%}"
+    if stt == "OPTIMAL":
+        st.success(f"Solver OPTIMAL (gap {gap_txt}).")
+    elif stt == "FEASIBLE":
+        st.warning(f"Solver FEASIBLE: plan válido pero no probado óptimo (gap {gap_txt} al cerrar el tiempo límite). "
+                   "Las cifras de costo y rupturas pueden variar entre ejecuciones; no usarlas como cifra oficial.")
+    elif stt == "FALLBACK_LINEA_BASE":
+        st.warning("El solver no encontró un plan mejor que la línea base según el objetivo ponderado; "
+                   "se muestra la línea base como plan optimizado.")
     else:
-        st.success(f"Solver OPTIMAL (gap {res.solver.gap:.1%}).")
+        st.error(f"Estado del solver: {stt}. No se obtuvo un plan; revise los datos y parámetros.")
     rows = []
     for bloque, pref in (("Dentro del horizonte", "hor_"), ("EM proyectada (fuera del horizonte)", "proj_")):
         for etiqueta, k, fmt in (("Contenedores", "n_containers", "{:.0f}"), ("% ≤ objetivo", "pct_dentro_objetivo", "{:.1f}"),
