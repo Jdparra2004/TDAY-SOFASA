@@ -226,15 +226,27 @@ def render_impacto_economico(res):
     c = st.columns(3)
     c[0].metric("Costo línea base (USD)", f"{cb['usd_total']:,.0f}")
     c[1].metric("Costo plan optimizado (USD)", f"{co['usd_total']:,.0f}")
-    c[2].metric("Ahorro (USD)", f"{res.ahorro_usd:,.0f}", delta=f"{res.ahorro_usd:,.0f}")
+    c[2].metric("Diferencia en demurrage + Suppla (USD)", f"{res.ahorro_usd:,.0f}", delta=f"{res.ahorro_usd:,.0f}",
+        help="Base menos óptimo. Mide solo USD de demurrage y Suppla; no es el beneficio total del plan.")
+    e = st.columns(4)
+    e[0].metric("Previo al día 0 (inevitable, USD)", f"{res.costos_base.acumulado_previo_usd:,.0f}")
+    e[1].metric("Costo evitable base (USD)", f"{res.costo_evitable_base:,.0f}")
+    e[2].metric("Costo evitable óptimo (USD)", f"{res.costo_evitable_opt:,.0f}")
+    e[3].metric("Rupturas evitadas", f"{res.rupturas_evitadas}", help="Contenedores con ruptura real en la base menos los del plan optimizado.")
+    if res.ahorro_usd < 0 and res.rupturas_evitadas > 0:
+        st.info("El plan prioriza evitar rupturas sobre el costo en USD (orden de prioridad del PDF). "
+                f"Costo neto: {res.costo_por_ruptura_evitada:,.0f} USD por ruptura evitada.")
 
     prom_dias_b = cb["dias_suppla"] / cb["n_via_suppla"] if cb["n_via_suppla"] > 0 else 0.0
     prom_dias_o = co["dias_suppla"] / co["n_via_suppla"] if co["n_via_suppla"] > 0 else 0.0
 
+    def _f(v, d=0):
+        return f"{v:,.{d}f}"
+
     desg = pd.DataFrame({
         "Concepto": ["Demurrage (días)", "Demurrage (USD)", "Contenedores vía Suppla (n)", "Almacenamiento Suppla (días / contenedor-días)", "Almacenamiento Suppla (USD)", "Días promedio en Suppla por contenedor", "Total (USD)"],
-        "Línea base": [cb["dias_demurrage"], cb["usd_demurrage"], cb["n_via_suppla"], cb["dias_suppla"], cb["usd_suppla"], f"{prom_dias_b:.1f}", cb["usd_total"]],
-        "Plan optimizado": [co["dias_demurrage"], co["usd_demurrage"], co["n_via_suppla"], co["dias_suppla"], co["usd_suppla"], f"{prom_dias_o:.1f}", co["usd_total"]],
+        "Línea base": [_f(cb["dias_demurrage"]), _f(cb["usd_demurrage"]), _f(cb["n_via_suppla"]), _f(cb["dias_suppla"]), _f(cb["usd_suppla"]), _f(prom_dias_b, 1), _f(cb["usd_total"])],
+        "Plan optimizado": [_f(co["dias_demurrage"]), _f(co["usd_demurrage"]), _f(co["n_via_suppla"]), _f(co["dias_suppla"]), _f(co["usd_suppla"]), _f(prom_dias_o, 1), _f(co["usd_total"])],
     })
     st.dataframe(desg, width="stretch", hide_index=True)
     st.caption(f"Demurrage ya acumulado antes del día 0 (inevitable): {res.costos_base.acumulado_previo_dias} días "

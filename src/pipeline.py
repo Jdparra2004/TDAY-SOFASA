@@ -93,6 +93,33 @@ class Resultado:
     def ahorro_usd(self) -> float:
         return self.costos_base.totals["usd_total"] - self.costos_opt.totals["usd_total"]
 
+    @property
+    def costo_evitable_base(self) -> float:
+        """Costo total de la base sin el demurrage ya acumulado antes del día 0 (inevitable)."""
+        return self.costos_base.totals["usd_total"] - self.costos_base.acumulado_previo_usd
+
+    @property
+    def costo_evitable_opt(self) -> float:
+        return self.costos_opt.totals["usd_total"] - self.costos_opt.acumulado_previo_usd
+
+    @property
+    def rupturas_base(self) -> int:
+        return int((self.base.container_df["rupture_days"] > 0).sum())
+
+    @property
+    def rupturas_opt(self) -> int:
+        return int((self.optimo.container_df["rupture_days"] > 0).sum())
+
+    @property
+    def rupturas_evitadas(self) -> int:
+        return self.rupturas_base - self.rupturas_opt
+
+    @property
+    def costo_por_ruptura_evitada(self) -> float:
+        """USD netos (óptimo − base) por cada ruptura evitada; negativo si el plan además ahorra. NaN si no se evita ninguna."""
+        n = self.rupturas_evitadas
+        return (-self.ahorro_usd) / n if n > 0 else float("nan")
+
 
 def capacity_usage(plan: Plan, params: Params) -> Dict[str, float]:
     """Uso máximo vs capacidad (SOFASA/día, Suppla/semana calendario, traslados/día)."""

@@ -91,6 +91,15 @@ def build_impacto(res: Resultado) -> pd.DataFrame:
                   "Línea base": cb.acumulado_previo_dias, "Plan optimizado": co.acumulado_previo_dias, "Ahorro (base − óptimo)": cb.acumulado_previo_dias - co.acumulado_previo_dias})
     filas.append({"Bloque": "Informativo", "Concepto": "Demurrage ya acumulado antes del día 0 (USD, inevitable)",
                   "Línea base": cb.acumulado_previo_usd, "Plan optimizado": co.acumulado_previo_usd, "Ahorro (base − óptimo)": cb.acumulado_previo_usd - co.acumulado_previo_usd})
+    filas.append({"Bloque": "Evitable", "Concepto": "Costo evitable (USD) = total − demurrage previo al día 0",
+                  "Línea base": res.costo_evitable_base, "Plan optimizado": res.costo_evitable_opt,
+                  "Ahorro (base − óptimo)": res.costo_evitable_base - res.costo_evitable_opt})
+    filas.append({"Bloque": "Rupturas", "Concepto": "Contenedores con ruptura (n)",
+                  "Línea base": res.rupturas_base, "Plan optimizado": res.rupturas_opt,
+                  "Ahorro (base − óptimo)": res.rupturas_evitadas})
+    filas.append({"Bloque": "Rupturas", "Concepto": "Costo neto por ruptura evitada (USD)",
+                  "Línea base": "", "Plan optimizado": "",
+                  "Ahorro (base − óptimo)": res.costo_por_ruptura_evitada})
     filas.append({"Bloque": "Nota", "Concepto": f"Ahorro contra la línea base simulada. Almacenamiento Suppla = {p.USD_SUPPLA_MES_40FT:,.2f} USD/mes por contenedor de 40 pies, prorrateado por día (supuesto).",
                   "Línea base": "", "Plan optimizado": "", "Ahorro (base − óptimo)": ""})
     return pd.DataFrame(filas)

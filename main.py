@@ -35,7 +35,10 @@ def main(fecha="2026-10-20", horizonte=20, cap_sofasa=14, cap_suppla_semana=15, 
     for nombre, c in (("Línea base", res.costos_base), ("Plan optimizado", res.costos_opt)):
         print(f"{nombre}: demurrage {c.totals['usd_demurrage']:,.0f} USD + almacenamiento Suppla {c.totals['usd_suppla']:,.0f} USD = {c.totals['usd_total']:,.0f} USD")
     print(f"Ahorro (base − óptimo, contra la línea base simulada): {res.ahorro_usd:,.0f} USD")
-    print_validaciones(res)
+    print(f"Demurrage previo al día 0 (inevitable): {res.costos_base.acumulado_previo_dias} días = {res.costos_base.acumulado_previo_usd:,.0f} USD")
+    print(f"Costo evitable: base {res.costo_evitable_base:,.0f} USD, óptimo {res.costo_evitable_opt:,.0f} USD")
+    print(f"Rupturas: {res.rupturas_base} -> {res.rupturas_opt} (evitadas {res.rupturas_evitadas}); "
+        f"costo neto por ruptura evitada: {res.costo_por_ruptura_evitada:,.0f} USD")
 
     xlsx = export_prescriptive_plan(res, os.path.join(out_dir, "plan_prescriptivo_sofasa.xlsx"))
     print(f"Entregable: {xlsx} (+ .csv)")
@@ -66,5 +69,7 @@ if __name__ == "__main__":
     ap.add_argument("--cap-suppla-semana", type=float, default=15, help="Capacidad Suppla por semana.")
     ap.add_argument("--cap-traslado", type=float, default=2, help="Capacidad de traslado por día.")
     ap.add_argument("--dias-traslado", default="0,1,2,3,4", help="Días habilitados de traslado (0=lunes ... 6=domingo), separados por coma.")
+    ap.add_argument("--datos", default=None, help="Carpeta con Tracking, Prioridades y DIEL (por ejemplo: data\\3nd Data).")
     a = ap.parse_args()
-    main(a.fecha, a.horizonte, a.cap_sofasa, a.cap_suppla_semana, a.cap_traslado, [int(x) for x in a.dias_traslado.split(",")])
+    main(a.fecha, a.horizonte, a.cap_sofasa, a.cap_suppla_semana, a.cap_traslado,
+        [int(x) for x in a.dias_traslado.split(",")], data_dir=a.datos)
